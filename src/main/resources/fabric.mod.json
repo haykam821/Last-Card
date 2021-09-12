@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "lastcard",
+	"version": "${version}",
+	"name": "Last Card",
+	"description": "A shedding card game for Minecraft.",
+	"authors": [
+		"haykam821"
+	],
+	"contact": {
+		"homepage": "https://github.com/haykam821/Last-Card#readme",
+		"issues": "https://github.com/haykam821/Last-Card/issues"
+	},
+	"entrypoints": {
+		"main": [
+			"io.github.haykam821.lastcard.Main"
+		]
+	},
+	"license": "MIT",
+	"icon": "assets/lastcard/icon.png",
+	"depends": {
+		"fabricloader": ">=0.4.0",
+		"plasmid": ">=0.4.22"
+	}
+}
