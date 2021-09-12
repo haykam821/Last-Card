@@ -87,6 +87,10 @@ public class PlayerEntry {
 		return this.cards;
 	}
 
+	public int getCardCount() {
+		return this.cards.size();
+	}
+
 	public void playCard(int index) {
 		Card card = this.cards.get(index);
 		this.playCard(card);
