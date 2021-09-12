@@ -16,6 +16,8 @@ public class CardDeck {
 				for (int value = set < 4 ? 0 : 1; value < 10; value++) {
 					this.cards.add(new NumberCard(color, value));
 				}
+
+				this.cards.add(new SkipCard(color));
 			}
 		}
 		Collections.shuffle(this.cards);

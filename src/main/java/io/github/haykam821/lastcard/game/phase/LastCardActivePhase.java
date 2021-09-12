@@ -44,6 +44,7 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 	private PlayerEntry turn;
 	private boolean singleplayer;
 	private boolean opened;
+	private boolean skipNextTurn = false;
 
 	public LastCardActivePhase(GameSpace gameSpace, LastCardMap map, GlobalWidgets widgets) {
 		this.gameSpace = gameSpace;
@@ -208,6 +209,10 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 		return null;
 	}
 
+	public PlayerEntry getPlayerEntry(int index) {
+		return this.players.get(index % this.players.size());
+	}
+
 	public ServerWorld getWorld() {
 		return this.gameSpace.getWorld();
 	}
@@ -220,13 +225,18 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 		return this.turn;
 	}
 
+	public int getNextTurnIndex(boolean skipNextTurn) {
+		int offset = skipNextTurn && this.skipNextTurn ? 2 : 1;
+		return this.players.indexOf(this.turn) + offset;
+	}
+
 	public void cycleTurn() {
 		if (this.players.isEmpty()) return;
 
 		PlayerEntry oldTurn = this.turn;
 
-		int index = this.players.indexOf(this.turn) + 1;
-		this.turn = this.players.get(index % this.players.size());
+		this.turn = this.getPlayerEntry(this.getNextTurnIndex(true));
+		this.skipNextTurn = false;
 
 		if (oldTurn != this.turn) {
 			this.sendNextTurnMessage();
@@ -242,6 +252,10 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 			}
 		}
 		this.turn.drawForTurn();
+	}
+
+	public void skipNextTurn() {
+		this.skipNextTurn = true;
 	}
 
 	private void sendNextTurnMessage() {

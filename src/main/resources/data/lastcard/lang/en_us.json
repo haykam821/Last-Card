@@ -6,6 +6,7 @@
 	"text.lastcard.card.color.red": "Red",
 	"text.lastcard.card.color.yellow": "Yellow",
 	"text.lastcard.card.number": "Number %s Card",
+	"text.lastcard.card.skip": "Skip Card",
 	"text.lastcard.card_drew": "%s drew a card.",
 	"text.lastcard.card_drew.you": "You drew %s.",
 	"text.lastcard.card_hand": "%s's Card Hand",
@@ -17,5 +18,7 @@
 	"text.lastcard.next_turn": "It is now %s's turn.",
 	"text.lastcard.no_winners": "Nobody won the game!",
 	"text.lastcard.last_played.none": "No cards have been played",
+	"text.lastcard.turn_skipped": "%s's turn was skipped.",
+	"text.lastcard.turn_skipped.you": "Your turn was skipped.",
 	"text.lastcard.win": "%s has won the game!"
 }
