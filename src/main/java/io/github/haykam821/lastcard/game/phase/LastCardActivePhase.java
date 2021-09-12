@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.haykam821.lastcard.Main;
-import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.game.LastPlayedBar;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
 import io.github.haykam821.lastcard.game.player.PlayerEntry;
+import io.github.haykam821.lastcard.turn.TurnManager;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -41,10 +41,9 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 	private final LastPlayedBar bar;
 	private final List<PlayerEntry> players;
 	private final CardDeck deck = new CardDeck();
-	private PlayerEntry turn;
+	private final TurnManager turnManager = new TurnManager(this);
 	private boolean singleplayer;
 	private boolean opened;
-	private boolean skipNextTurn = false;
 
 	public LastCardActivePhase(GameSpace gameSpace, LastCardMap map, GlobalWidgets widgets) {
 		this.gameSpace = gameSpace;
@@ -97,7 +96,7 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 			PlayerEntry entry = new PlayerEntry(this, player, home);
 
 			if (index == 0) {
-				this.turn = entry;
+				this.turnManager.setTurn(entry);
 			}
 			this.players.add(entry);
 
@@ -105,7 +104,7 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 			index += 1;
 		}
 
-		this.sendNextTurnMessage();
+		this.turnManager.sendNextTurnMessage();
 		this.updateBar();
 	}
 
@@ -147,8 +146,8 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 		if (entry == null) return;
 
 		// Skip turn
-		if (entry == this.turn) {
-			this.cycleTurn();
+		if (this.turnManager.hasTurn(entry)) {
+			this.turnManager.cycleTurn();
 		}
 		this.players.remove(entry);
 	}
@@ -221,49 +220,6 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 		return this.map;
 	}
 
-	public PlayerEntry getTurn() {
-		return this.turn;
-	}
-
-	public int getNextTurnIndex(boolean skipNextTurn) {
-		int offset = skipNextTurn && this.skipNextTurn ? 2 : 1;
-		return this.players.indexOf(this.turn) + offset;
-	}
-
-	public void cycleTurn() {
-		if (this.players.isEmpty()) return;
-
-		PlayerEntry oldTurn = this.turn;
-
-		this.turn = this.getPlayerEntry(this.getNextTurnIndex(true));
-		this.skipNextTurn = false;
-
-		if (oldTurn != this.turn) {
-			this.sendNextTurnMessage();
-
-			oldTurn.teleportHome();
-			this.turn.teleportHome();
-		}
-
-		// Draw a card if none are playable
-		for (Card card : this.turn.getCards()) {
-			if (card.canPlay(this.turn)) {
-				return;
-			}
-		}
-		this.turn.drawForTurn();
-	}
-
-	public void skipNextTurn() {
-		this.skipNextTurn = true;
-	}
-
-	private void sendNextTurnMessage() {
-		if (this.turn != null) {
-			this.sendMessage(this.turn.getNextTurnMessage());
-		}
-	}
-
 	public void sendMessage(Text message) {
 		this.gameSpace.getPlayers().sendMessage(message);
 	}
@@ -278,8 +234,16 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 		}
 	}
 
+	public List<PlayerEntry> getPlayers() {
+		return this.players;
+	}
+
 	public CardDeck getDeck() {
 		return this.deck;
+	}
+
+	public TurnManager getTurnManager() {
+		return this.turnManager;
 	}
 
 	protected static void setRules(GameLogic game) {

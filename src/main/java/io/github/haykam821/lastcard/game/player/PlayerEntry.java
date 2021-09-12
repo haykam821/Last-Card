@@ -34,7 +34,7 @@ public class PlayerEntry {
 	}
 
 	public boolean hasTurn() {
-		return this == this.phase.getTurn();
+		return this.phase.getTurnManager().hasTurn(this);
 	}
 
 	public Vec3d getCurrentHome() {
@@ -68,7 +68,7 @@ public class PlayerEntry {
 	}
 
 	public Text getNextTurnMessage() {
-		return new TranslatableText("text.lastcard.next_turn", this.getName()).formatted(Formatting.GOLD);
+		return new TranslatableText("text.lastcard.turn.next", this.getName()).formatted(Formatting.GOLD);
 	}
 
 	public Text getName() {
@@ -104,7 +104,7 @@ public class PlayerEntry {
 			if (this.cards.isEmpty()) {
 				this.phase.endWithWinner(this);
 			} else {
-				this.phase.cycleTurn();
+				this.phase.getTurnManager().cycleTurn();
 			}
 		}
 	}
@@ -119,7 +119,7 @@ public class PlayerEntry {
 		this.cards.add(card);
 
 		this.phase.sendMessageWithException(this.getCardDrewMessage(), this, this.getCardDrewYouMessage(card));
-		this.phase.cycleTurn();
+		this.phase.getTurnManager().cycleTurn();
 	}
 
 	private Text getCardDrewMessage() {

@@ -17,6 +17,7 @@ public class CardDeck {
 					this.cards.add(new NumberCard(color, value));
 				}
 
+				this.cards.add(new ReverseCard(color));
 				this.cards.add(new SkipCard(color));
 			}
 		}

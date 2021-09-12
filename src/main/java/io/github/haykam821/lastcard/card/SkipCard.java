@@ -31,21 +31,21 @@ public class SkipCard extends Card {
 		super.play(player);
 
 		this.sendTurnSkippedMessage(player.getPhase());
-		player.getPhase().skipNextTurn();
+		player.getPhase().getTurnManager().skipNextTurn();
 	}
 
 	private void sendTurnSkippedMessage(LastCardActivePhase phase) {
-		int skippedIndex = phase.getNextTurnIndex(false);
+		int skippedIndex = phase.getTurnManager().getNextTurnIndex(false);
 		PlayerEntry skippedPlayer = phase.getPlayerEntry(skippedIndex);
 
 		phase.sendMessageWithException(this.getTurnSkippedMessage(skippedPlayer), skippedPlayer, this.getTurnSkippedYouMessage());
 	}
 
 	private Text getTurnSkippedMessage(PlayerEntry player) {
-		return new TranslatableText("text.lastcard.turn_skipped", player.getName()).formatted(Formatting.GOLD);
+		return new TranslatableText("text.lastcard.turn.skipped", player.getName()).formatted(Formatting.GOLD);
 	}
 
 	private Text getTurnSkippedYouMessage() {
-		return new TranslatableText("text.lastcard.turn_skipped.you").formatted(Formatting.GOLD);
+		return new TranslatableText("text.lastcard.turn.skipped.you").formatted(Formatting.GOLD);
 	}
 }
