@@ -209,7 +209,7 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 	}
 
 	public PlayerEntry getPlayerEntry(int index) {
-		return this.players.get(index % this.players.size());
+		return this.players.get(Math.floorMod(index, this.players.size()));
 	}
 
 	public ServerWorld getWorld() {
