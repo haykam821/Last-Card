@@ -46,7 +46,7 @@ public class PlayerEntry {
 
 	public void teleportHome() {
 		Vec3d home = this.getCurrentHome();
-		this.player.teleport(this.phase.getWorld(), home.getX(), home.getY(), home.getZ(), this.player.yaw, this.player.pitch);
+		this.player.teleport(this.phase.getWorld(), home.getX(), home.getY(), home.getZ(), this.player.getYaw(), this.player.getPitch());
 	}
 
 	public void tick() {
@@ -56,7 +56,7 @@ public class PlayerEntry {
 	}
 
 	public void spawn() {
-		this.player.inventory.setStack(0, new ItemStack(Main.CARD_HAND));
+		this.player.getInventory().setStack(0, new ItemStack(Main.CARD_HAND));
 		this.player.currentScreenHandler.sendContentUpdates();
 
 		this.player.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, Integer.MAX_VALUE, 128, true, false));
@@ -131,7 +131,7 @@ public class PlayerEntry {
 	}
 
 	public void openCardHand() {
-		player.openHandledScreen(CardHandGui.build(this));
+		CardHandGui.build(this).open();
 	}
 
 	@Override

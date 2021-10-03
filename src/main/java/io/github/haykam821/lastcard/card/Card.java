@@ -27,7 +27,7 @@ public abstract class Card {
 		}
 
 		ItemStack stack = builder.build();
-		stack.getTag().putInt("HideFlags", TooltipSection.ENCHANTMENTS.getFlag());
+		stack.getNbt().putInt("HideFlags", TooltipSection.ENCHANTMENTS.getFlag());
 
 		return stack;
 	}

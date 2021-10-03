@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.github.haykam821.lastcard.game.map.LastCardMapConfig;
-import xyz.nucleoid.plasmid.game.config.PlayerConfig;
+import xyz.nucleoid.plasmid.game.common.config.PlayerConfig;
 
 public class LastCardConfig {
 	public static final Codec<LastCardConfig> CODEC = RecordCodecBuilder.create(instance -> {

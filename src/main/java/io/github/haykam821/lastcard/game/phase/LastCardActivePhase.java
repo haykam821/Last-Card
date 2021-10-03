@@ -9,6 +9,8 @@ import io.github.haykam821.lastcard.game.LastPlayedBar;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
 import io.github.haykam821.lastcard.game.player.PlayerEntry;
 import io.github.haykam821.lastcard.turn.TurnManager;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,24 +21,26 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import xyz.nucleoid.plasmid.game.GameActivity;
 import xyz.nucleoid.plasmid.game.GameCloseReason;
-import xyz.nucleoid.plasmid.game.GameLogic;
 import xyz.nucleoid.plasmid.game.GameSpace;
-import xyz.nucleoid.plasmid.game.event.GameOpenListener;
-import xyz.nucleoid.plasmid.game.event.GameTickListener;
-import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDamageListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
-import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
-import xyz.nucleoid.plasmid.game.event.UseItemListener;
-import xyz.nucleoid.plasmid.game.rule.GameRule;
-import xyz.nucleoid.plasmid.game.rule.RuleResult;
-import xyz.nucleoid.plasmid.widget.GlobalWidgets;
+import xyz.nucleoid.plasmid.game.common.GlobalWidgets;
+import xyz.nucleoid.plasmid.game.event.GameActivityEvents;
+import xyz.nucleoid.plasmid.game.event.GamePlayerEvents;
+import xyz.nucleoid.plasmid.game.rule.GameRuleType;
+import xyz.nucleoid.stimuli.event.item.ItemPickupEvent;
+import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
+import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
+import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
+import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardActivePhase implements GameOpenListener, GameTickListener, PlayerAddListener, PlayerDamageListener, PlayerDeathListener, PlayerRemoveListener, UseItemListener {
+public class LastCardActivePhase implements GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Add, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent {
 	private final GameSpace gameSpace;
+	private final ServerWorld world;
 	private final LastCardMap map;
 	private final LastPlayedBar bar;
 	private final List<PlayerEntry> players;
@@ -45,44 +49,47 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 	private boolean singleplayer;
 	private boolean opened;
 
-	public LastCardActivePhase(GameSpace gameSpace, LastCardMap map, GlobalWidgets widgets) {
+	public LastCardActivePhase(GameSpace gameSpace, ServerWorld world, LastCardMap map, GlobalWidgets widgets) {
 		this.gameSpace = gameSpace;
+		this.world = world;
 		this.map = map;
 
 		this.bar = new LastPlayedBar(this, widgets);
 
-		int playerCount = this.gameSpace.getPlayerCount();
+		int playerCount = this.gameSpace.getPlayers().size();
 		this.players = new ArrayList<>(playerCount);
 		this.singleplayer = playerCount == 1;
 	}
 
-	public static void open(GameSpace gameSpace, LastCardMap map) {
-		gameSpace.openGame(game -> {
-			GlobalWidgets widgets = new GlobalWidgets(game);
-			LastCardActivePhase phase = new LastCardActivePhase(gameSpace, map, widgets);
+	public static void open(GameSpace gameSpace, ServerWorld world, LastCardMap map) {
+		gameSpace.setActivity(activity -> {
+			GlobalWidgets widgets = GlobalWidgets.addTo(activity);
+			LastCardActivePhase phase = new LastCardActivePhase(gameSpace, world, map, widgets);
 
-			LastCardActivePhase.setRules(game);
+			LastCardActivePhase.setRules(activity);
 
 			// Listeners
-			game.on(GameOpenListener.EVENT, phase);
-			game.on(GameTickListener.EVENT, phase);
-			game.on(PlayerAddListener.EVENT, phase);
-			game.on(PlayerDamageListener.EVENT, phase);
-			game.on(PlayerDeathListener.EVENT, phase);
-			game.on(PlayerRemoveListener.EVENT, phase);
-			game.on(UseItemListener.EVENT, phase);
+			activity.listen(GameActivityEvents.ENABLE, phase);
+			activity.listen(GameActivityEvents.TICK, phase);
+			activity.listen(GamePlayerEvents.ADD, phase);
+			activity.listen(PlayerDamageEvent.EVENT, phase);
+			activity.listen(PlayerDeathEvent.EVENT, phase);
+			activity.listen(GamePlayerEvents.REMOVE, phase);
+			activity.listen(ItemUseEvent.EVENT, phase);
+			activity.listen(FluidFlowEvent.EVENT, phase);
+			activity.listen(ItemPickupEvent.EVENT, phase);
 		});
 	}
 
 	// Listeners
 
 	@Override
-	public void onOpen() {
+	public void onEnable() {
 		this.opened = true;
 
 		// Angle calculation
 		int index = 0;
-		int size = gameSpace.getPlayerCount() + 1;
+		int size = gameSpace.getPlayers().size() + 1;
 
 		Vec3d podium = this.map.getPodium();
 		double distance = this.map.getPodiumDistance();
@@ -123,7 +130,7 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 	@Override
 	public void onAddPlayer(ServerPlayerEntity player) {
 		if (this.opened) {
-			player.setGameMode(GameMode.SPECTATOR);
+			player.changeGameMode(GameMode.SPECTATOR);
 		}
 	}
 
@@ -153,7 +160,7 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 	}
 
 	@Override
-	public TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
+	public TypedActionResult<ItemStack> onUse(ServerPlayerEntity player, Hand hand) {
 		ItemStack stack = player.getStackInHand(hand);
 		if (stack.getItem() == Main.CARD_HAND) {
 			PlayerEntry entry = this.getPlayerEntry(player);
@@ -164,6 +171,16 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 		}
 		
 		return TypedActionResult.pass(stack);
+	}
+
+	@Override
+	public ActionResult onFluidFlow(ServerWorld world, BlockPos fluidPos, BlockState fluidBlock, Direction flowDirection, BlockPos flowTo, BlockState flowToBlock) {
+		return ActionResult.FAIL;
+	}
+
+	@Override
+	public ActionResult onPickupItem(ServerPlayerEntity player, ItemEntity entity, ItemStack stack) {
+		return ActionResult.FAIL;
 	}
 
 	// Utilities
@@ -213,7 +230,7 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 	}
 
 	public ServerWorld getWorld() {
-		return this.gameSpace.getWorld();
+		return this.world;
 	}
 
 	public LastCardMap getMap() {
@@ -246,21 +263,19 @@ public class LastCardActivePhase implements GameOpenListener, GameTickListener, 
 		return this.turnManager;
 	}
 
-	protected static void setRules(GameLogic game) {
-		game.setRule(GameRule.BLOCK_DROPS, RuleResult.DENY);
-		game.setRule(GameRule.BREAK_BLOCKS, RuleResult.DENY);
-		game.setRule(GameRule.CRAFTING, RuleResult.DENY);
-		game.setRule(GameRule.DISMOUNT_VEHICLE, RuleResult.DENY);
-		game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
-		game.setRule(GameRule.FLUID_FLOW, RuleResult.DENY);
-		game.setRule(GameRule.HUNGER, RuleResult.DENY);
-		game.setRule(GameRule.INTERACTION, RuleResult.DENY);
-		game.setRule(GameRule.MODIFY_ARMOR, RuleResult.DENY);
-		game.setRule(GameRule.PICKUP_ITEMS, RuleResult.DENY);
-		game.setRule(GameRule.PLACE_BLOCKS, RuleResult.DENY);
-		game.setRule(GameRule.PORTALS, RuleResult.DENY);
-		game.setRule(GameRule.PVP, RuleResult.DENY);
-		game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
+	protected static void setRules(GameActivity activity) {
+		activity.deny(GameRuleType.BLOCK_DROPS);
+		activity.deny(GameRuleType.BREAK_BLOCKS);
+		activity.deny(GameRuleType.CRAFTING);
+		activity.deny(GameRuleType.DISMOUNT_VEHICLE);
+		activity.deny(GameRuleType.FALL_DAMAGE);
+		activity.deny(GameRuleType.HUNGER);
+		activity.deny(GameRuleType.INTERACTION);
+		activity.deny(GameRuleType.MODIFY_ARMOR);
+		activity.deny(GameRuleType.PLACE_BLOCKS);
+		activity.deny(GameRuleType.PORTALS);
+		activity.deny(GameRuleType.PVP);
+		activity.deny(GameRuleType.THROW_ITEMS);
 	}
 
 	protected static void spawn(ServerWorld world, LastCardMap map, ServerPlayerEntity player) {

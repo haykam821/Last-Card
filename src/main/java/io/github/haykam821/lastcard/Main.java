@@ -13,7 +13,7 @@ public class Main implements ModInitializer {
 	private static final String MOD_ID = "lastcard";
 
 	private static final Identifier LAST_CARD_ID = new Identifier(MOD_ID, "last_card");
-	public static final GameType<LastCardConfig> LAST_CARD_TYPE = GameType.register(LAST_CARD_ID, LastCardWaitingPhase::open, LastCardConfig.CODEC);
+	public static final GameType<LastCardConfig> LAST_CARD_TYPE = GameType.register(LAST_CARD_ID, LastCardConfig.CODEC, LastCardWaitingPhase::open);
 
 	private static final Identifier CARD_HAND_ID = new Identifier(MOD_ID, "card_hand");
 	public static final Item CARD_HAND = new CardHandItem(new Item.Settings());

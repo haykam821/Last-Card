@@ -3,7 +3,7 @@ package io.github.haykam821.lastcard.game.map;
 import java.util.Random;
 
 import net.minecraft.util.math.BlockPos;
-import xyz.nucleoid.plasmid.map.template.MapTemplate;
+import xyz.nucleoid.map_templates.MapTemplate;
 
 public class LastCardMapBuilder {
 	private final LastCardMapConfig mapConfig;
