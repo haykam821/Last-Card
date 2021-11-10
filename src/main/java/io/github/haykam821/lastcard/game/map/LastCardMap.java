@@ -10,15 +10,21 @@ public class LastCardMap {
 	private final LastCardMapConfig mapConfig;
 	private final MapTemplate template;
 	private final Vec3d podium;
+	private final Vec3d spawnPos;
 
 	public LastCardMap(LastCardMapConfig mapConfig, MapTemplate template) {
 		this.mapConfig = mapConfig;
 		this.template = template;
 		this.podium = LastCardMap.calculatePodium(this.mapConfig);
+		this.spawnPos = this.podium.add(0, 3, 0);
 	}
 
 	public Vec3d getPodium() {
 		return this.podium;
+	}
+
+	public Vec3d getSpawnPos() {
+		return this.spawnPos;
 	}
 
 	public double getPodiumDistance() {

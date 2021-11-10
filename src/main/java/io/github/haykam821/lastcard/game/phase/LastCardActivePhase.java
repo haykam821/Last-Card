@@ -31,6 +31,8 @@ import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.common.GlobalWidgets;
 import xyz.nucleoid.plasmid.game.event.GameActivityEvents;
 import xyz.nucleoid.plasmid.game.event.GamePlayerEvents;
+import xyz.nucleoid.plasmid.game.player.PlayerOffer;
+import xyz.nucleoid.plasmid.game.player.PlayerOfferResult;
 import xyz.nucleoid.plasmid.game.rule.GameRuleType;
 import xyz.nucleoid.stimuli.event.item.ItemPickupEvent;
 import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
@@ -38,7 +40,7 @@ import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardActivePhase implements GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Add, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent {
+public class LastCardActivePhase implements GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 	private final LastCardMap map;
@@ -71,7 +73,7 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 			// Listeners
 			activity.listen(GameActivityEvents.ENABLE, phase);
 			activity.listen(GameActivityEvents.TICK, phase);
-			activity.listen(GamePlayerEvents.ADD, phase);
+			activity.listen(GamePlayerEvents.OFFER, phase);
 			activity.listen(PlayerDamageEvent.EVENT, phase);
 			activity.listen(PlayerDeathEvent.EVENT, phase);
 			activity.listen(GamePlayerEvents.REMOVE, phase);
@@ -128,10 +130,10 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 	}
 
 	@Override
-	public void onAddPlayer(ServerPlayerEntity player) {
-		if (this.opened) {
-			player.changeGameMode(GameMode.SPECTATOR);
-		}
+	public PlayerOfferResult onOfferPlayer(PlayerOffer offer) {
+		return offer.accept(this.world, this.map.getSpawnPos()).and(() -> {
+			offer.player().changeGameMode(GameMode.SPECTATOR);
+		});
 	}
 
 	@Override
