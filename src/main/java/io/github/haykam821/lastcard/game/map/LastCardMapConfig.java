@@ -5,10 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.stateprovider.BlockStateProvider;
-import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider;
 
 public class LastCardMapConfig {
-	private static final BlockStateProvider DEFAULT_FLOOR_PROVIDER = new SimpleBlockStateProvider(Blocks.GRAY_CONCRETE.getDefaultState());
+	private static final BlockStateProvider DEFAULT_FLOOR_PROVIDER = BlockStateProvider.of(Blocks.GRAY_CONCRETE);
 
 	public static final Codec<LastCardMapConfig> CODEC = RecordCodecBuilder.create(instance -> {
 		return instance.group(
