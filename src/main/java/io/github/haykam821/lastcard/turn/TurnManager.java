@@ -31,6 +31,9 @@ public class TurnManager {
 	public void cycleTurn() {
 		if (this.phase.getPlayers().isEmpty()) return;
 
+		this.turn.renderDisplays();
+		this.phase.renderPileDisplay();
+
 		PlayerEntry oldTurn = this.turn;
 
 		this.turn = this.phase.getPlayerEntry(this.getNextTurnIndex(true));

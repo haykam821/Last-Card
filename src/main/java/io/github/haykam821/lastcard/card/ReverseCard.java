@@ -1,12 +1,14 @@
 package io.github.haykam821.lastcard.card;
 
+import eu.pb4.mapcanvas.api.core.DrawableCanvas;
+import io.github.haykam821.lastcard.card.display.CardTemplates;
 import io.github.haykam821.lastcard.game.player.PlayerEntry;
 import io.github.haykam821.lastcard.turn.TurnDirection;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
-public class ReverseCard extends Card {
+public class ReverseCard extends SymbolCard {
 	public ReverseCard(CardColor color) {
 		super(color);
 	}
@@ -36,5 +38,10 @@ public class ReverseCard extends Card {
 
 	private Text getTurnDirectionMessage(TurnDirection direction) {
 		return new TranslatableText("text.lastcard.turn.direction_changed", direction.getName()).formatted(Formatting.GOLD);
+	}
+
+	@Override
+	public DrawableCanvas getSymbol() {
+		return CardTemplates.REVERSE_SYMBOL;
 	}
 }

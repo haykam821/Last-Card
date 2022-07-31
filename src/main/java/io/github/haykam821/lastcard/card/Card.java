@@ -1,5 +1,8 @@
 package io.github.haykam821.lastcard.card;
 
+import eu.pb4.mapcanvas.api.core.CanvasColor;
+import eu.pb4.mapcanvas.api.core.DrawableCanvas;
+import eu.pb4.mapcanvas.api.utils.ViewUtils;
 import io.github.haykam821.lastcard.game.player.PlayerEntry;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.boss.BossBar;
@@ -61,6 +64,18 @@ public abstract class Card {
 	public BossBar.Color getBossBarColor() {
 		return this.color.getBossBarColor();
 	}
+
+	public final DrawableCanvas render() {
+		DrawableCanvas canvas = this.color.getTemplate().copy();
+		CanvasColor textColor = this.color.getCanvasTextColor();
+
+		this.renderOverlay(canvas, textColor);
+		this.renderOverlay(ViewUtils.flipY(ViewUtils.flipX(canvas)), textColor);
+		
+		return canvas;
+	}
+
+	public abstract void renderOverlay(DrawableCanvas canvas, CanvasColor textColor);
 
 	private Text getCardPlayedMessage(PlayerEntry player) {
 		return new TranslatableText("text.lastcard.card_played", player.getName(), this.getFullName()).formatted(Formatting.GOLD);

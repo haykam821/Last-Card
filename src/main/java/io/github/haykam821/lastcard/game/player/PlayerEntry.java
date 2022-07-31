@@ -3,8 +3,12 @@ package io.github.haykam821.lastcard.game.player;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.display.CardDisplay;
+import io.github.haykam821.lastcard.card.display.PrivateCardDisplay;
+import io.github.haykam821.lastcard.card.display.PublicCardDisplay;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -13,6 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class PlayerEntry {
@@ -23,6 +28,9 @@ public class PlayerEntry {
 	private final Vec3d home;
 	private final List<Card> cards = new ArrayList<>(INITIAL_HAND_COUNT);
 
+	private final CardDisplay privateDisplay;
+	private final CardDisplay publicDisplay;
+
 	public PlayerEntry(LastCardActivePhase phase, ServerPlayerEntity player, Vec3d home) {
 		this.phase = phase;
 		this.player = player;
@@ -31,6 +39,11 @@ public class PlayerEntry {
 		for (int index = 0; index < INITIAL_HAND_COUNT; index++) {
 			this.cards.add(this.phase.getDeck().draw());
 		}
+
+		BlockPos displayPos = new BlockPos(home.getX() - 1, home.getY(), home.getZ() - 1);
+
+		this.privateDisplay = new PrivateCardDisplay(this, DrawableCanvas.create(3, 3), displayPos, 0);
+		this.publicDisplay = new PublicCardDisplay(this, DrawableCanvas.create(3, 3), displayPos, 0);
 	}
 
 	public boolean hasTurn() {
@@ -132,6 +145,29 @@ public class PlayerEntry {
 
 	public void openCardHand() {
 		CardHandGui.build(this).open();
+	}
+
+	// Displays
+	private CardDisplay getDisplayViewableBy(ServerPlayerEntity viewer) {
+		return this.getPlayer() == viewer ? this.privateDisplay : this.publicDisplay;
+	}
+
+	public void addDisplay(ServerPlayerEntity viewer) {
+		this.getDisplayViewableBy(viewer).add(viewer);
+	}
+
+	public void removeDisplay(ServerPlayerEntity viewer) {
+		this.getDisplayViewableBy(viewer).remove(viewer);
+	}
+
+	public void destroyDisplays() {
+		this.privateDisplay.destroy();
+		this.publicDisplay.destroy();
+	}
+
+	public void renderDisplays() {
+		this.privateDisplay.render();
+		this.publicDisplay.render();
 	}
 
 	@Override

@@ -3,8 +3,11 @@ package io.github.haykam821.lastcard.game.phase;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.CardDeck;
+import io.github.haykam821.lastcard.card.display.CardDisplay;
+import io.github.haykam821.lastcard.card.display.PileCardDisplay;
 import io.github.haykam821.lastcard.game.LastPlayedBar;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
 import io.github.haykam821.lastcard.game.player.PlayerEntry;
@@ -40,7 +43,7 @@ import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardActivePhase implements GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent {
+public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 	private final LastCardMap map;
@@ -48,6 +51,7 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 	private final List<PlayerEntry> players;
 	private final CardDeck deck = new CardDeck();
 	private final TurnManager turnManager = new TurnManager(this);
+	private final CardDisplay pileDisplay;
 	private boolean singleplayer;
 	private boolean opened;
 
@@ -61,6 +65,8 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 		int playerCount = this.gameSpace.getPlayers().size();
 		this.players = new ArrayList<>(playerCount);
 		this.singleplayer = playerCount == 1;
+
+		this.pileDisplay = new PileCardDisplay(this.getDeck(), DrawableCanvas.create(3, 3), new BlockPos(map.getPodium()), 0);
 	}
 
 	public static void open(GameSpace gameSpace, ServerWorld world, LastCardMap map) {
@@ -71,6 +77,7 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 			LastCardActivePhase.setRules(activity);
 
 			// Listeners
+			activity.listen(GameActivityEvents.DESTROY, phase);
 			activity.listen(GameActivityEvents.ENABLE, phase);
 			activity.listen(GameActivityEvents.TICK, phase);
 			activity.listen(GamePlayerEvents.OFFER, phase);
@@ -84,6 +91,10 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 	}
 
 	// Listeners
+	@Override
+	public void onDestroy(GameCloseReason reason) {
+		this.pileDisplay.destroy();
+	}
 
 	@Override
 	public void onEnable() {
@@ -109,8 +120,20 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 			}
 			this.players.add(entry);
 
+			this.pileDisplay.add(player);
+
 			entry.spawn();
 			index += 1;
+		}
+
+		this.renderPileDisplay();
+		
+		for (PlayerEntry player : this.players) {
+			for (ServerPlayerEntity viewer : this.gameSpace.getPlayers()) {
+				player.addDisplay(viewer);
+			}
+
+			player.renderDisplays();
 		}
 
 		this.turnManager.sendNextTurnMessage();
@@ -133,6 +156,12 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 	public PlayerOfferResult onOfferPlayer(PlayerOffer offer) {
 		return offer.accept(this.world, this.map.getSpawnPos()).and(() -> {
 			offer.player().changeGameMode(GameMode.SPECTATOR);
+
+			this.pileDisplay.add(offer.player());
+
+			for (PlayerEntry player : this.players) {
+				player.addDisplay(offer.player());
+			}
 		});
 	}
 
@@ -153,6 +182,14 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 
 		PlayerEntry entry = this.getPlayerEntry(player);
 		if (entry == null) return;
+
+		this.pileDisplay.remove(player);
+
+		for (ServerPlayerEntity viewer : this.gameSpace.getPlayers()) {
+			entry.removeDisplay(viewer);
+		}
+
+		entry.destroyDisplays();
 
 		// Skip turn
 		if (this.turnManager.hasTurn(entry)) {
@@ -263,6 +300,10 @@ public class LastCardActivePhase implements GameActivityEvents.Enable, GameActiv
 
 	public TurnManager getTurnManager() {
 		return this.turnManager;
+	}
+
+	public void renderPileDisplay() {
+		this.pileDisplay.render();
 	}
 
 	protected static void setRules(GameActivity activity) {

@@ -1,12 +1,14 @@
 package io.github.haykam821.lastcard.card;
 
+import eu.pb4.mapcanvas.api.core.DrawableCanvas;
+import io.github.haykam821.lastcard.card.display.CardTemplates;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import io.github.haykam821.lastcard.game.player.PlayerEntry;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
-public class SkipCard extends Card {
+public class SkipCard extends SymbolCard {
 	public SkipCard(CardColor color) {
 		super(color);
 	}
@@ -47,5 +49,10 @@ public class SkipCard extends Card {
 
 	private Text getTurnSkippedYouMessage() {
 		return new TranslatableText("text.lastcard.turn.skipped.you").formatted(Formatting.GOLD);
+	}
+
+	@Override
+	public DrawableCanvas getSymbol() {
+		return CardTemplates.SKIP_SYMBOL;
 	}
 }
