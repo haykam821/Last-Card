@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
-import eu.pb4.mapcanvas.api.core.PlayerCanvas;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.CardDeck;
-import net.minecraft.util.math.BlockPos;
+import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class PileCardDisplay extends CardDisplay {
 	private final CardDeck deck;
 
-	public PileCardDisplay(CardDeck deck, PlayerCanvas canvas, BlockPos pos, int rotation) {
-		super(canvas, pos, rotation);
+	public PileCardDisplay(CardDeck deck, TemplateRegion region) {
+		super(region);
 
 		this.deck = deck;
 	}

@@ -1,9 +1,7 @@
 {
 	"type": "lastcard:last_card",
-	"map": {
-		"x": 32,
-		"z": 32
-	},
+	"icon": "minecraft:spruce_sapling",
+	"map": "lastcard:spruce_lodge",
 	"players": {
 		"min": 1,
 		"max": 12,

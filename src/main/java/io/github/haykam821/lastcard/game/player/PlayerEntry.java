@@ -3,77 +3,57 @@ package io.github.haykam821.lastcard.game.player;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.PrivateCardDisplay;
 import io.github.haykam821.lastcard.card.display.PublicCardDisplay;
+import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class PlayerEntry {
 	private static final int INITIAL_HAND_COUNT = 7;
 
 	private final LastCardActivePhase phase;
 	private final ServerPlayerEntity player;
-	private final Vec3d home;
 	private final List<Card> cards = new ArrayList<>(INITIAL_HAND_COUNT);
 
+	private final Chair chair;
 	private final CardDisplay privateDisplay;
 	private final CardDisplay publicDisplay;
 
-	public PlayerEntry(LastCardActivePhase phase, ServerPlayerEntity player, Vec3d home) {
+	public PlayerEntry(LastCardActivePhase phase, ServerPlayerEntity player, TemplateRegion chair, TemplateRegion privateDisplay, TemplateRegion publicDisplay) {
 		this.phase = phase;
 		this.player = player;
-		this.home = home;
 		
 		for (int index = 0; index < INITIAL_HAND_COUNT; index++) {
 			this.cards.add(this.phase.getDeck().draw());
 		}
 
-		BlockPos displayPos = new BlockPos(home.getX() - 1, home.getY(), home.getZ() - 1);
-
-		this.privateDisplay = new PrivateCardDisplay(this, DrawableCanvas.create(3, 3), displayPos, 0);
-		this.publicDisplay = new PublicCardDisplay(this, DrawableCanvas.create(3, 3), displayPos, 0);
+		this.chair = new Chair(chair);
+		this.privateDisplay = new PrivateCardDisplay(this, privateDisplay);
+		this.publicDisplay = new PublicCardDisplay(this, publicDisplay);
 	}
 
 	public boolean hasTurn() {
 		return this.phase.getTurnManager().hasTurn(this);
 	}
 
-	public Vec3d getCurrentHome() {
-		if (this.hasTurn()) {
-			return this.phase.getMap().getPodium();
-		}
-		return this.home;
-	}
-
-	public void teleportHome() {
-		Vec3d home = this.getCurrentHome();
-		this.player.teleport(this.phase.getWorld(), home.getX(), home.getY(), home.getZ(), this.player.getYaw(), this.player.getPitch());
-	}
-
-	public void tick() {
-		if (!this.player.getPos().equals(this.getCurrentHome())) {
-			this.teleportHome();
-		}
+	public Chair getChair() {
+		return this.chair;
 	}
 
 	public void spawn() {
 		this.player.getInventory().setStack(0, new ItemStack(Main.CARD_HAND));
 		this.player.currentScreenHandler.sendContentUpdates();
 
-		this.player.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, Integer.MAX_VALUE, 128, true, false));
-		this.teleportHome();
+		this.chair.teleport(this.player);
 	}
 
 	public Text getWinMessage() {
@@ -172,6 +152,6 @@ public class PlayerEntry {
 
 	@Override
 	public String toString() {
-		return "PlayerEntry{player=" + this.player + ", home=" + this.home + "}";
+		return "PlayerEntry{player=" + this.player + ", chair=" + this.chair + "}";
 	}
 }

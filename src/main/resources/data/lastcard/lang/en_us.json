@@ -1,5 +1,5 @@
 {
-	"game.lastcard.standard_last_card": "Last Card",
+	"game.lastcard.spruce_lodge_last_card": "Last Card: Spruce Lodge",
 	"gameType.lastcard.last_card": "Last Card",
 	"item.lastcard.card_hand": "Card Hand",
 	"text.lastcard.card.color.blue": "Blue",
@@ -19,6 +19,7 @@
 	"text.lastcard.last_played": "Last played: %s",
 	"text.lastcard.no_winners": "Nobody won the game!",
 	"text.lastcard.last_played.none": "No cards have been played",
+	"text.lastcard.template_load_failed": "Failed to load the map template",
 	"text.lastcard.turn.direction.clockwise": "clockwise",
 	"text.lastcard.turn.direction.counterclockwise": "counterclockwise",
 	"text.lastcard.turn.direction_changed": "The turn direction is now %s.",

@@ -16,6 +16,9 @@
 			"io.github.haykam821.lastcard.Main"
 		]
 	},
+	"mixins": [
+		"lastcard.mixin.json"
+	],
 	"license": "MIT",
 	"icon": "assets/lastcard/icon.png",
 	"depends": {

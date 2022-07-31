@@ -8,15 +8,23 @@ import eu.pb4.mapcanvas.api.core.PlayerCanvas;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay;
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.game.map.LastCardRegions;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import xyz.nucleoid.map_templates.TemplateRegion;
 
 public abstract class CardDisplay {
 	private final Map<Card, DrawableCanvas> canvasCache = new HashMap<>();
 	private final VirtualDisplay display;
 
-	protected CardDisplay(PlayerCanvas canvas, BlockPos pos, int rotation) {
+	protected CardDisplay(TemplateRegion region) {
+		BlockPos size = region.getBounds().size();
+		PlayerCanvas canvas = DrawableCanvas.create(size.getX() + 1, size.getZ() + 1);
+
+		BlockPos pos = region.getBounds().min();
+		int rotation = region.getData() == null ? 0 : region.getData().getInt(LastCardRegions.ROTATION_KEY);
+
 		this.display = VirtualDisplay.of(canvas, pos, Direction.UP, rotation, false);
 	}
 

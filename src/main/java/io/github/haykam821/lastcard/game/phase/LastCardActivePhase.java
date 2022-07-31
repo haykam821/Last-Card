@@ -3,12 +3,12 @@ package io.github.haykam821.lastcard.game.phase;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.PileCardDisplay;
 import io.github.haykam821.lastcard.game.LastPlayedBar;
+import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
 import io.github.haykam821.lastcard.game.player.PlayerEntry;
 import io.github.haykam821.lastcard.turn.TurnManager;
@@ -24,10 +24,11 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import xyz.nucleoid.map_templates.TemplateRegion;
 import xyz.nucleoid.plasmid.game.GameActivity;
 import xyz.nucleoid.plasmid.game.GameCloseReason;
 import xyz.nucleoid.plasmid.game.GameSpace;
@@ -37,13 +38,14 @@ import xyz.nucleoid.plasmid.game.event.GamePlayerEvents;
 import xyz.nucleoid.plasmid.game.player.PlayerOffer;
 import xyz.nucleoid.plasmid.game.player.PlayerOfferResult;
 import xyz.nucleoid.plasmid.game.rule.GameRuleType;
+import xyz.nucleoid.stimuli.event.block.BlockUseEvent;
 import xyz.nucleoid.stimuli.event.item.ItemPickupEvent;
 import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent {
+public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent, BlockUseEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 	private final LastCardMap map;
@@ -66,7 +68,7 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 		this.players = new ArrayList<>(playerCount);
 		this.singleplayer = playerCount == 1;
 
-		this.pileDisplay = new PileCardDisplay(this.getDeck(), DrawableCanvas.create(3, 3), new BlockPos(map.getPodium()), 0);
+		this.pileDisplay = new PileCardDisplay(this.getDeck(), this.map.getPileCardDisplay());
 	}
 
 	public static void open(GameSpace gameSpace, ServerWorld world, LastCardMap map) {
@@ -75,6 +77,7 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 			LastCardActivePhase phase = new LastCardActivePhase(gameSpace, world, map, widgets);
 
 			LastCardActivePhase.setRules(activity);
+			activity.allow(GameRuleType.DISMOUNT_VEHICLE);
 
 			// Listeners
 			activity.listen(GameActivityEvents.DESTROY, phase);
@@ -87,6 +90,7 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 			activity.listen(ItemUseEvent.EVENT, phase);
 			activity.listen(FluidFlowEvent.EVENT, phase);
 			activity.listen(ItemPickupEvent.EVENT, phase);
+			activity.listen(BlockUseEvent.EVENT, phase);
 		});
 	}
 
@@ -102,18 +106,13 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 
 		// Angle calculation
 		int index = 0;
-		int size = gameSpace.getPlayers().size() + 1;
-
-		Vec3d podium = this.map.getPodium();
-		double distance = this.map.getPodiumDistance();
 
 		for (ServerPlayerEntity player : gameSpace.getPlayers()) {
-			double theta = (index / (float) size) * 2 * Math.PI;
-			double x = podium.getX() + Math.sin(theta) * distance;
-			double z = podium.getZ() - Math.cos(theta) * distance;
-			Vec3d home = new Vec3d(x, podium.getY(), z);
+			TemplateRegion chair = this.map.getChair(index);
+			TemplateRegion privateCardDisplay = this.map.getPrivateCardDisplay(index);
+			TemplateRegion publicCardDisplay = this.map.getPublicCardDisplay(index);
 
-			PlayerEntry entry = new PlayerEntry(this, player, home);
+			PlayerEntry entry = new PlayerEntry(this, player, chair, privateCardDisplay, publicCardDisplay);
 
 			if (index == 0) {
 				this.turnManager.setTurn(entry);
@@ -142,10 +141,6 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 
 	@Override
 	public void onTick() {
-		for (PlayerEntry player : this.players) {
-			player.tick();
-		}
-
 		// End early if there are not enough players to continue
 		if (this.shouldEndEarly()) {
 			this.endWithMessage(this.getEndingMessage());
@@ -154,9 +149,7 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 
 	@Override
 	public PlayerOfferResult onOfferPlayer(PlayerOffer offer) {
-		return offer.accept(this.world, this.map.getSpawnPos()).and(() -> {
-			offer.player().changeGameMode(GameMode.SPECTATOR);
-
+		return this.map.getWaitingSpawn().acceptOffer(offer, this.world, GameMode.SPECTATOR).and(() -> {
 			this.pileDisplay.add(offer.player());
 
 			for (PlayerEntry player : this.players) {
@@ -219,6 +212,21 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 
 	@Override
 	public ActionResult onPickupItem(ServerPlayerEntity player, ItemEntity entity, ItemStack stack) {
+		return ActionResult.FAIL;
+	}
+
+	@Override
+	public ActionResult onUse(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
+		PlayerEntry entry = this.getPlayerEntry(player);
+		
+		if (entry != null) {
+			Chair chair = entry.getChair();
+
+			if (chair.isAt(hitResult.getBlockPos())) {
+				chair.teleport(player);
+			}
+		}
+
 		return ActionResult.FAIL;
 	}
 
@@ -322,7 +330,6 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 	}
 
 	protected static void spawn(ServerWorld world, LastCardMap map, ServerPlayerEntity player) {
-		Vec3d podium = map.getPodium();
-		player.teleport(world, podium.getX(), podium.getY(), podium.getZ(), 0, 0);
+		map.getWaitingSpawn().teleport(player);
 	}
 }

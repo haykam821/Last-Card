@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "io.github.haykam821.lastcard.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+		"ArmorStandEntityAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -1,34 +1,27 @@
 package io.github.haykam821.lastcard.game.map;
 
-import java.util.Random;
+import java.io.IOException;
 
-import net.minecraft.util.math.BlockPos;
+import io.github.haykam821.lastcard.game.LastCardConfig;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.TranslatableText;
 import xyz.nucleoid.map_templates.MapTemplate;
+import xyz.nucleoid.map_templates.MapTemplateSerializer;
+import xyz.nucleoid.plasmid.game.GameOpenException;
 
 public class LastCardMapBuilder {
-	private final LastCardMapConfig mapConfig;
+	private final LastCardConfig config;
 
-	public LastCardMapBuilder(LastCardMapConfig mapConfig) {
-		this.mapConfig = mapConfig;
+	public LastCardMapBuilder(LastCardConfig config) {
+		this.config = config;
 	}
 
-	public LastCardMap create() {
-		MapTemplate template = MapTemplate.createEmpty();
-
-		this.buildFloor(template);
-		return new LastCardMap(this.mapConfig, template);
-	}
-
-	private void buildFloor(MapTemplate template) {
-		Random random = new Random();
-
-		BlockPos.Mutable pos = new BlockPos.Mutable();
-		for (int x = 0; x < this.mapConfig.getX(); x++) {
-			pos.setX(x);
-			for (int z = 0; z < this.mapConfig.getZ(); z++) {
-				pos.setZ(z);
-				template.setBlockState(pos, this.mapConfig.getFloorProvider().getBlockState(random, pos));
-			}
+	public LastCardMap create(MinecraftServer server) {
+		try {
+			MapTemplate template = MapTemplateSerializer.loadFromResource(server, this.config.getMap());
+			return new LastCardMap(template);
+		} catch (IOException exception) {
+			throw new GameOpenException(new TranslatableText("text.infiniteparkour.template_load_failed"), exception);
 		}
 	}
 }

@@ -43,8 +43,8 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 	public static GameOpenProcedure open(GameOpenContext<LastCardConfig> context) {
 		LastCardConfig config = context.config();
 
-		LastCardMapBuilder mapBuilder = new LastCardMapBuilder(config.getMapConfig());
-		LastCardMap map = mapBuilder.create();
+		LastCardMapBuilder mapBuilder = new LastCardMapBuilder(config);
+		LastCardMap map = mapBuilder.create(context.server());
 
 		RuntimeWorldConfig worldConfig = new RuntimeWorldConfig()
 			.setGenerator(map.createGenerator(context.server()));
@@ -78,9 +78,7 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 
 	@Override
 	public PlayerOfferResult onOfferPlayer(PlayerOffer offer) {
-		return offer.accept(this.world, this.map.getPodium()).and(() -> {
-			offer.player().changeGameMode(GameMode.ADVENTURE);
-		});
+		return this.map.getWaitingSpawn().acceptOffer(offer, this.world, GameMode.ADVENTURE);
 	}
 
 	@Override

@@ -41,9 +41,6 @@ public class TurnManager {
 
 		if (oldTurn != this.turn) {
 			this.sendNextTurnMessage();
-
-			oldTurn.teleportHome();
-			this.turn.teleportHome();
 		}
 
 		// Draw a card if none are playable

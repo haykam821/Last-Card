@@ -1,45 +1,62 @@
 package io.github.haykam821.lastcard.game.map;
 
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Util;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import xyz.nucleoid.map_templates.MapTemplate;
+import xyz.nucleoid.map_templates.TemplateRegion;
 import xyz.nucleoid.plasmid.game.world.generator.TemplateChunkGenerator;
 
 public class LastCardMap {
-	private final LastCardMapConfig mapConfig;
+	private static final Random RANDOM = new Random();
+
 	private final MapTemplate template;
-	private final Vec3d podium;
-	private final Vec3d spawnPos;
 
-	public LastCardMap(LastCardMapConfig mapConfig, MapTemplate template) {
-		this.mapConfig = mapConfig;
+	private final List<Spawn> waitingSpawns;
+	private final TemplateRegion pileCardDisplay;
+
+	public LastCardMap(MapTemplate template) {
 		this.template = template;
-		this.podium = LastCardMap.calculatePodium(this.mapConfig);
-		this.spawnPos = this.podium.add(0, 3, 0);
-	}
 
-	public Vec3d getPodium() {
-		return this.podium;
-	}
+		this.waitingSpawns = this.template.getMetadata().getRegions(LastCardRegions.WAITING_SPAWN_MARKER)
+			.map(Spawn::new)
+			.toList();
 
-	public Vec3d getSpawnPos() {
-		return this.spawnPos;
-	}
-
-	public double getPodiumDistance() {
-		if (this.mapConfig.getX() < this.mapConfig.getZ()) {
-			return this.mapConfig.getX() / (double) 2 - 3;
-		} else {
-			return this.mapConfig.getZ() / (double) 2 - 3;
+		if (this.waitingSpawns.isEmpty()) {
+			throw new IllegalStateException("There are no waiting spawns");
 		}
+
+		this.pileCardDisplay = this.template.getMetadata().getFirstRegion(LastCardRegions.PILE_CARD_DISPLAY_MARKER);
+
+		if (this.pileCardDisplay == null) {
+			throw new IllegalStateException("The pile card display region is missing");
+		}
+	}
+
+	public Spawn getWaitingSpawn() {
+		return Util.getRandom(this.waitingSpawns, RANDOM);
+	}
+
+	public TemplateRegion getChair(int index) {
+		return LastCardRegions.getRegion(this.template, LastCardRegions.CHAIR_MARKER, index);
+	}
+
+	public TemplateRegion getPileCardDisplay() {
+		return this.pileCardDisplay;
+	}
+
+	public TemplateRegion getPrivateCardDisplay(int index) {
+		return LastCardRegions.getRegion(this.template, LastCardRegions.PRIVATE_CARD_DISPLAY_MARKER, index);
+	}
+
+	public TemplateRegion getPublicCardDisplay(int index) {
+		return LastCardRegions.getRegion(this.template, LastCardRegions.PUBLIC_CARD_DISPLAY_MARKER, index);
 	}
 
 	public ChunkGenerator createGenerator(MinecraftServer server) {
 		return new TemplateChunkGenerator(server, this.template);
-	}
-
-	private static Vec3d calculatePodium(LastCardMapConfig mapConfig) {
-		return new Vec3d(mapConfig.getX() / 2f, 1, mapConfig.getZ() / 2f);
 	}
 }
