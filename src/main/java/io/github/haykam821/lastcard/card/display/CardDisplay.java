@@ -12,6 +12,7 @@ import io.github.haykam821.lastcard.game.map.LastCardRegions;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import xyz.nucleoid.map_templates.BlockBounds;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public abstract class CardDisplay {
@@ -19,11 +20,16 @@ public abstract class CardDisplay {
 	private final VirtualDisplay display;
 
 	protected CardDisplay(TemplateRegion region) {
-		BlockPos size = region.getBounds().size();
-		PlayerCanvas canvas = DrawableCanvas.create(size.getX() + 1, size.getZ() + 1);
+		BlockBounds bounds = region.getBounds();
+		BlockPos size = bounds.size();
 
-		BlockPos pos = region.getBounds().min();
-		int rotation = region.getData() == null ? 0 : region.getData().getInt(LastCardRegions.ROTATION_KEY);
+		int rotation = region.getData() == null ? 0 : region.getData().getInt(LastCardRegions.ROTATION_KEY) % 4;
+
+		int x = size.getX() + 1;
+		int z = size.getZ() + 1;
+
+		PlayerCanvas canvas = rotation % 2 == 0 ? DrawableCanvas.create(x, z) : DrawableCanvas.create(z, x);
+		BlockPos pos = rotation == 1 || rotation == 2 ? bounds.max() : bounds.min();
 
 		this.display = VirtualDisplay.of(canvas, pos, Direction.UP, rotation, false);
 	}
