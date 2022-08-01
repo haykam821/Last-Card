@@ -43,6 +43,10 @@ public final class CardHandGui {
 
 			gui.addSlot(entry);
 			index += 1;
+
+			if (index >= gui.getSize() - 1) {
+				break;
+			}
 		}
 
 		return gui;

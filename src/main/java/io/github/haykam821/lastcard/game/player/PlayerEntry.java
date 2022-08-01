@@ -18,11 +18,9 @@ import net.minecraft.util.Formatting;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class PlayerEntry {
-	private static final int INITIAL_HAND_COUNT = 7;
-
 	private final LastCardActivePhase phase;
 	private final ServerPlayerEntity player;
-	private final List<Card> cards = new ArrayList<>(INITIAL_HAND_COUNT);
+	private final List<Card> cards;
 
 	private final Chair chair;
 	private final CardDisplay privateDisplay;
@@ -31,8 +29,11 @@ public class PlayerEntry {
 	public PlayerEntry(LastCardActivePhase phase, ServerPlayerEntity player, TemplateRegion chair, TemplateRegion privateDisplay, TemplateRegion publicDisplay) {
 		this.phase = phase;
 		this.player = player;
-		
-		for (int index = 0; index < INITIAL_HAND_COUNT; index++) {
+
+		int initialHandCount = phase.getConfig().getInitialHandCount().get(player.getRandom());
+		this.cards = new ArrayList<>(initialHandCount);
+
+		for (int index = 0; index < initialHandCount; index++) {
 			this.cards.add(this.phase.getDeck().draw());
 		}
 

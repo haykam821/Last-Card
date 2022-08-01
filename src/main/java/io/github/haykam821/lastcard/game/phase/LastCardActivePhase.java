@@ -7,6 +7,7 @@ import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.PileCardDisplay;
+import io.github.haykam821.lastcard.game.LastCardConfig;
 import io.github.haykam821.lastcard.game.LastPlayedBar;
 import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
@@ -48,6 +49,7 @@ import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent, BlockUseEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
+	private final LastCardConfig config;
 	private final LastCardMap map;
 	private final LastPlayedBar bar;
 	private final List<PlayerEntry> players;
@@ -57,9 +59,10 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 	private boolean singleplayer;
 	private boolean opened;
 
-	public LastCardActivePhase(GameSpace gameSpace, ServerWorld world, LastCardMap map, GlobalWidgets widgets) {
+	public LastCardActivePhase(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map, GlobalWidgets widgets) {
 		this.gameSpace = gameSpace;
 		this.world = world;
+		this.config = config;
 		this.map = map;
 
 		this.bar = new LastPlayedBar(this, widgets);
@@ -71,10 +74,10 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 		this.pileDisplay = new PileCardDisplay(this.getDeck(), this.map.getPileCardDisplay());
 	}
 
-	public static void open(GameSpace gameSpace, ServerWorld world, LastCardMap map) {
+	public static void open(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map) {
 		gameSpace.setActivity(activity -> {
 			GlobalWidgets widgets = GlobalWidgets.addTo(activity);
-			LastCardActivePhase phase = new LastCardActivePhase(gameSpace, world, map, widgets);
+			LastCardActivePhase phase = new LastCardActivePhase(gameSpace, world, config, map, widgets);
 
 			LastCardActivePhase.setRules(activity);
 			activity.allow(GameRuleType.DISMOUNT_VEHICLE);
@@ -278,6 +281,10 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 
 	public ServerWorld getWorld() {
 		return this.world;
+	}
+
+	public LastCardConfig getConfig() {
+		return this.config;
 	}
 
 	public LastCardMap getMap() {

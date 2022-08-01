@@ -32,11 +32,15 @@ import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GameActivityEvents.RequestStart, FluidFlowEvent, ItemPickupEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
+
+	private final LastCardConfig config;
 	private final LastCardMap map;
 
-	public LastCardWaitingPhase(GameSpace gameSpace, ServerWorld world, LastCardMap map) {
+	public LastCardWaitingPhase(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map) {
 		this.gameSpace = gameSpace;
 		this.world = world;
+
+		this.config = config;
 		this.map = map;
 	}
 
@@ -50,7 +54,7 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 			.setGenerator(map.createGenerator(context.server()));
 
 		return context.openWithWorld(worldConfig, (activity, world) -> {
-			LastCardWaitingPhase phase = new LastCardWaitingPhase(activity.getGameSpace(), world, map);
+			LastCardWaitingPhase phase = new LastCardWaitingPhase(activity.getGameSpace(), world, config, map);
 			GameWaitingLobby.addTo(activity, config.getPlayerConfig());
 
 			LastCardActivePhase.setRules(activity);
@@ -94,7 +98,7 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 
 	@Override
 	public GameResult onRequestStart() {
-		LastCardActivePhase.open(this.gameSpace, this.world, this.map);
+		LastCardActivePhase.open(this.gameSpace, this.world, this.config, this.map);
 		return GameResult.ok();
 	}
 }
