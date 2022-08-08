@@ -1,8 +1,8 @@
 package io.github.haykam821.lastcard.turn;
 
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
-import io.github.haykam821.lastcard.game.player.PlayerEntry;
 
 public class TurnManager {
 	private final LastCardActivePhase phase;

@@ -1,7 +1,7 @@
 package io.github.haykam821.lastcard.card.display.region;
 
 import io.github.haykam821.lastcard.card.Card;
-import io.github.haykam821.lastcard.game.player.PlayerEntry;
+import io.github.haykam821.lastcard.game.PlayerEntry;
 
 public class PlayCardRegion extends CardRegion {
 	private final Card card;

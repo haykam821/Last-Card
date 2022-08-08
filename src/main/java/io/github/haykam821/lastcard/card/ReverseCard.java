@@ -2,7 +2,7 @@ package io.github.haykam821.lastcard.card;
 
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
-import io.github.haykam821.lastcard.game.player.PlayerEntry;
+import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.turn.TurnDirection;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;

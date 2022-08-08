@@ -1,6 +1,6 @@
 package io.github.haykam821.lastcard.card.display.region;
 
-import io.github.haykam821.lastcard.game.player.PlayerEntry;
+import io.github.haykam821.lastcard.game.PlayerEntry;
 
 public abstract class CardRegion {
 	private final int minX;

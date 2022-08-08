@@ -1,16 +1,14 @@
-package io.github.haykam821.lastcard.game.player;
+package io.github.haykam821.lastcard.game;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.PrivateCardDisplay;
 import io.github.haykam821.lastcard.card.display.PublicCardDisplay;
 import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -51,9 +49,6 @@ public class PlayerEntry {
 	}
 
 	public void spawn() {
-		this.player.getInventory().setStack(0, new ItemStack(Main.CARD_HAND));
-		this.player.currentScreenHandler.sendContentUpdates();
-
 		this.chair.teleport(this.player);
 	}
 
@@ -83,11 +78,6 @@ public class PlayerEntry {
 
 	public int getCardCount() {
 		return this.cards.size();
-	}
-
-	public void playCard(int index) {
-		Card card = this.cards.get(index);
-		this.playCard(card);
 	}
 
 	public void playCard(Card card) {
@@ -122,10 +112,6 @@ public class PlayerEntry {
 
 	private Text getCardDrewYouMessage(Card card) {
 		return new TranslatableText("text.lastcard.card_drew.you", card.getFullName()).formatted(Formatting.GOLD);
-	}
-
-	public void openCardHand() {
-		CardHandGui.build(this).open();
 	}
 
 	// Displays

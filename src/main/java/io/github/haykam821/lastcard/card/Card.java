@@ -3,7 +3,7 @@ package io.github.haykam821.lastcard.card;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.utils.ViewUtils;
-import io.github.haykam821.lastcard.game.player.PlayerEntry;
+import io.github.haykam821.lastcard.game.PlayerEntry;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.item.ItemStack;

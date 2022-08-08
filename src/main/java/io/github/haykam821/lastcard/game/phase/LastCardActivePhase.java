@@ -3,15 +3,14 @@ package io.github.haykam821.lastcard.game.phase;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.PileCardDisplay;
 import io.github.haykam821.lastcard.game.LastCardConfig;
 import io.github.haykam821.lastcard.game.LastPlayedBar;
+import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
-import io.github.haykam821.lastcard.game.player.PlayerEntry;
 import io.github.haykam821.lastcard.turn.TurnManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ItemEntity;
@@ -24,7 +23,6 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -41,12 +39,11 @@ import xyz.nucleoid.plasmid.game.player.PlayerOfferResult;
 import xyz.nucleoid.plasmid.game.rule.GameRuleType;
 import xyz.nucleoid.stimuli.event.block.BlockUseEvent;
 import xyz.nucleoid.stimuli.event.item.ItemPickupEvent;
-import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent, BlockUseEvent {
+public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, FluidFlowEvent, ItemPickupEvent, BlockUseEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 	private final LastCardConfig config;
@@ -90,7 +87,6 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 			activity.listen(PlayerDamageEvent.EVENT, phase);
 			activity.listen(PlayerDeathEvent.EVENT, phase);
 			activity.listen(GamePlayerEvents.REMOVE, phase);
-			activity.listen(ItemUseEvent.EVENT, phase);
 			activity.listen(FluidFlowEvent.EVENT, phase);
 			activity.listen(ItemPickupEvent.EVENT, phase);
 			activity.listen(BlockUseEvent.EVENT, phase);
@@ -192,20 +188,6 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 			this.turnManager.cycleTurn();
 		}
 		this.players.remove(entry);
-	}
-
-	@Override
-	public TypedActionResult<ItemStack> onUse(ServerPlayerEntity player, Hand hand) {
-		ItemStack stack = player.getStackInHand(hand);
-		if (stack.getItem() == Main.CARD_HAND) {
-			PlayerEntry entry = this.getPlayerEntry(player);
-			if (entry != null) {
-				entry.openCardHand();
-				return TypedActionResult.success(stack);
-			}
-		}
-		
-		return TypedActionResult.pass(stack);
 	}
 
 	@Override

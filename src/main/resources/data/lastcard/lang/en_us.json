@@ -1,7 +1,6 @@
 {
 	"game.lastcard.spruce_lodge_last_card": "Last Card: Spruce Lodge",
 	"gameType.lastcard.last_card": "Last Card",
-	"item.lastcard.card_hand": "Card Hand",
 	"text.lastcard.card.color.blue": "Blue",
 	"text.lastcard.card.color.green": "Green",
 	"text.lastcard.card.color.red": "Red",
@@ -11,9 +10,6 @@
 	"text.lastcard.card.skip": "Skip Card",
 	"text.lastcard.card_drew": "%s drew a card.",
 	"text.lastcard.card_drew.you": "You drew %s.",
-	"text.lastcard.card_hand": "%s's Card Hand",
-	"text.lastcard.card_hand.info": "Card Hand Info",
-	"text.lastcard.card_hand.info.count": "Card Count: %s",
 	"text.lastcard.card_played": "%s played %s.",
 	"text.lastcard.card_played.you": "You played %s.",
 	"text.lastcard.last_played": "Last played: %s",
