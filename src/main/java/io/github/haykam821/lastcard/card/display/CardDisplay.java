@@ -1,25 +1,37 @@
 package io.github.haykam821.lastcard.card.display;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.core.PlayerCanvas;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay;
+import eu.pb4.mapcanvas.api.utils.VirtualDisplay.InteractionCallback;
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.display.region.CardRegion;
 import io.github.haykam821.lastcard.game.map.LastCardRegions;
+import io.github.haykam821.lastcard.game.phase.PlayerEntryGetter;
+import io.github.haykam821.lastcard.game.player.PlayerEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import xyz.nucleoid.map_templates.BlockBounds;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
-public abstract class CardDisplay {
+public abstract class CardDisplay implements InteractionCallback {
+	private final PlayerEntryGetter entryGetter;
+
 	private final Map<Card, DrawableCanvas> canvasCache = new HashMap<>();
 	private final VirtualDisplay display;
 
-	protected CardDisplay(TemplateRegion region) {
+	private final Set<CardRegion> regions = new HashSet<>();
+
+	protected CardDisplay(PlayerEntryGetter entryGetter, TemplateRegion region) {
+		this.entryGetter = entryGetter;
+
 		BlockBounds bounds = region.getBounds();
 		BlockPos size = bounds.size();
 
@@ -31,11 +43,12 @@ public abstract class CardDisplay {
 		PlayerCanvas canvas = rotation % 2 == 0 ? DrawableCanvas.create(x, z) : DrawableCanvas.create(z, x);
 		BlockPos pos = rotation == 1 || rotation == 2 ? bounds.max() : bounds.min();
 
-		this.display = VirtualDisplay.of(canvas, pos, Direction.UP, rotation, false);
+		this.display = VirtualDisplay.of(canvas, pos, Direction.UP, rotation, false, this);
 	}
 
-	public void render() {
+	public void update() {
 		CanvasUtils.clear(this.getCanvas());
+		this.regions.clear();
 
 		int x = CardSpacing.PADDING_X;
 		int y = CardSpacing.PADDING_Y;
@@ -47,8 +60,11 @@ public abstract class CardDisplay {
 			DrawableCanvas cardCanvas = this.getCardCanvas(card);
 
 			if (cardCanvas != null) {
-				int newX = x + cardCanvas.getWidth() + CardSpacing.GAP_X;
-				maxHeight = Math.max(maxHeight, cardCanvas.getHeight());
+				int width = cardCanvas.getWidth();
+				int height = cardCanvas.getHeight();
+
+				int newX = x + width + CardSpacing.GAP_X;
+				maxHeight = Math.max(maxHeight, height);
 
 				if (newX >= maxX) {
 					x = CardSpacing.PADDING_X;
@@ -57,6 +73,11 @@ public abstract class CardDisplay {
 
 				CanvasUtils.draw(this.getCanvas(), x, y, cardCanvas);
 
+				CardRegion region = this.getCardRegion(card, x, y, x + width, x + height);
+				if (region != null) {
+					this.regions.add(region);
+				}
+
 				if (newX < maxX) {
 					x = newX;
 				}
@@ -64,6 +85,20 @@ public abstract class CardDisplay {
 		}
 
 		this.getCanvas().sendUpdates();
+	}
+
+	@Override
+	public void onClick(ServerPlayerEntity player, int x, int y) {
+		PlayerEntry entry = this.entryGetter.getPlayerEntry(player);
+
+		if (entry != null) {
+			for (CardRegion region : this.regions) {
+				if (region.contains(x, y)) {
+					region.onClick(entry);
+					return;
+				}
+			}
+		}
 	}
 
 	private final PlayerCanvas getCanvas() {
@@ -91,5 +126,9 @@ public abstract class CardDisplay {
 
 	public final DrawableCanvas getCardCanvas(Card card) {
 		return this.canvasCache.computeIfAbsent(card, this::renderCardCanvas);
+	}
+
+	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {
+		return null;
 	}
 }

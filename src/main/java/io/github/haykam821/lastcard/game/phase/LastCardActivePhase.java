@@ -46,7 +46,7 @@ import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent, BlockUseEvent {
+public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, ItemUseEvent, FluidFlowEvent, ItemPickupEvent, BlockUseEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 	private final LastCardConfig config;
@@ -71,7 +71,7 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 		this.players = new ArrayList<>(playerCount);
 		this.singleplayer = playerCount == 1;
 
-		this.pileDisplay = new PileCardDisplay(this.getDeck(), this.map.getPileCardDisplay());
+		this.pileDisplay = new PileCardDisplay(this.getDeck(), this, this.map.getPileCardDisplay());
 	}
 
 	public static void open(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map) {
@@ -128,14 +128,14 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 			index += 1;
 		}
 
-		this.renderPileDisplay();
+		this.updatePileDisplay();
 		
 		for (PlayerEntry player : this.players) {
 			for (ServerPlayerEntity viewer : this.gameSpace.getPlayers()) {
 				player.addDisplay(viewer);
 			}
 
-			player.renderDisplays();
+			player.updateDisplays();
 		}
 
 		this.turnManager.sendNextTurnMessage();
@@ -266,7 +266,8 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 		this.opened = false;
 	}
 
-	private PlayerEntry getPlayerEntry(ServerPlayerEntity player) {
+	@Override
+	public PlayerEntry getPlayerEntry(ServerPlayerEntity player) {
 		for (PlayerEntry entry : this.players) {
 			if (player == entry.getPlayer()) {
 				return entry;
@@ -317,8 +318,8 @@ public class LastCardActivePhase implements GameActivityEvents.Destroy, GameActi
 		return this.turnManager;
 	}
 
-	public void renderPileDisplay() {
-		this.pileDisplay.render();
+	public void updatePileDisplay() {
+		this.pileDisplay.update();
 	}
 
 	protected static void setRules(GameActivity activity) {

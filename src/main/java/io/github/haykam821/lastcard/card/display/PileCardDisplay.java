@@ -6,13 +6,14 @@ import java.util.List;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.CardDeck;
+import io.github.haykam821.lastcard.game.phase.PlayerEntryGetter;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class PileCardDisplay extends CardDisplay {
 	private final CardDeck deck;
 
-	public PileCardDisplay(CardDeck deck, TemplateRegion region) {
-		super(region);
+	public PileCardDisplay(CardDeck deck, PlayerEntryGetter entryGetter, TemplateRegion region) {
+		super(entryGetter, region);
 
 		this.deck = deck;
 	}

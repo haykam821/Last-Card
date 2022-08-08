@@ -8,7 +8,7 @@ public abstract class PlayerCardDisplay extends CardDisplay {
 	private final PlayerEntry player;
 
 	protected PlayerCardDisplay(PlayerEntry player, TemplateRegion region) {
-		super(region);
+		super(player.getPhase(), region);
 
 		this.player = player;
 	}

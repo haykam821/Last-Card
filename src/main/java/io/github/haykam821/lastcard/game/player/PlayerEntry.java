@@ -90,7 +90,7 @@ public class PlayerEntry {
 		this.playCard(card);
 	}
 
-	private void playCard(Card card) {
+	public void playCard(Card card) {
 		if (card.canPlay(this)) {
 			this.discardCard(card);
 			card.play(this);
@@ -146,9 +146,9 @@ public class PlayerEntry {
 		this.publicDisplay.destroy();
 	}
 
-	public void renderDisplays() {
-		this.privateDisplay.render();
-		this.publicDisplay.render();
+	public void updateDisplays() {
+		this.privateDisplay.update();
+		this.publicDisplay.update();
 	}
 
 	@Override
