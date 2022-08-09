@@ -73,6 +73,10 @@ public abstract class CardDisplay implements InteractionCallback {
 
 				CanvasUtils.draw(this.getCanvas(), x, y, cardCanvas);
 
+				if (this.hasOutline(card)) {
+					CardOutlineRenderer.render(this.getCanvas(), x - 1, y - 1, width + 1, height + 1);
+				}
+
 				CardRegion region = this.getCardRegion(card, x, y, x + width, x + height);
 				if (region != null) {
 					this.regions.add(region);
@@ -126,6 +130,10 @@ public abstract class CardDisplay implements InteractionCallback {
 
 	public final DrawableCanvas getCardCanvas(Card card) {
 		return this.canvasCache.computeIfAbsent(card, this::renderCardCanvas);
+	}
+
+	public boolean hasOutline(Card card) {
+		return false;
 	}
 
 	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {

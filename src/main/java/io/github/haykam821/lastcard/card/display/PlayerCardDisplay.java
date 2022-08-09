@@ -5,7 +5,7 @@ import io.github.haykam821.lastcard.game.PlayerEntry;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public abstract class PlayerCardDisplay extends CardDisplay {
-	private final PlayerEntry player;
+	protected final PlayerEntry player;
 
 	protected PlayerCardDisplay(PlayerEntry player, TemplateRegion region) {
 		super(player.getPhase(), region);

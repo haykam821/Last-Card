@@ -18,6 +18,11 @@ public class PrivateCardDisplay extends PlayerCardDisplay {
 	}
 
 	@Override
+	public boolean hasOutline(Card card) {
+		return card.canPlay(this.player);
+	}
+
+	@Override
 	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {
 		return new PlayCardRegion(card, minX, minY, maxX, maxY);
 	}

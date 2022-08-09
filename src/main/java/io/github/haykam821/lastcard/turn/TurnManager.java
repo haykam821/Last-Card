@@ -31,9 +31,6 @@ public class TurnManager {
 	public void cycleTurn() {
 		if (this.phase.getPlayers().isEmpty()) return;
 
-		this.turn.updateDisplays();
-		this.phase.updatePileDisplay();
-
 		PlayerEntry oldTurn = this.turn;
 
 		this.turn = this.phase.getPlayerEntry(this.getNextTurnIndex(true));
@@ -41,7 +38,11 @@ public class TurnManager {
 
 		if (oldTurn != this.turn) {
 			this.sendNextTurnMessage();
+			oldTurn.updateDisplays();
 		}
+
+		this.turn.updateDisplays();
+		this.phase.updatePileDisplay();
 
 		// Draw a card if none are playable
 		for (Card card : this.turn.getCards()) {
