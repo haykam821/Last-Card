@@ -300,6 +300,11 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 		return this.turnManager;
 	}
 
+	@Override
+	public PlayerEntry getTurn() {
+		return this.turnManager.getTurn();
+	}
+
 	public void updatePileDisplay() {
 		this.pileDisplay.update();
 	}

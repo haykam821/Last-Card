@@ -22,7 +22,7 @@ import xyz.nucleoid.map_templates.BlockBounds;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public abstract class CardDisplay implements InteractionCallback {
-	private final PlayerEntryGetter entryGetter;
+	protected final PlayerEntryGetter entryGetter;
 
 	private final Map<Card, DrawableCanvas> canvasCache = new HashMap<>();
 	private final VirtualDisplay display;

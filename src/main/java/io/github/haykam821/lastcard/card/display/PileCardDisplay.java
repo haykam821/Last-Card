@@ -6,6 +6,8 @@ import java.util.List;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.CardDeck;
+import io.github.haykam821.lastcard.card.display.region.CardRegion;
+import io.github.haykam821.lastcard.card.display.region.DrawCardRegion;
 import io.github.haykam821.lastcard.game.phase.PlayerEntryGetter;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
@@ -41,5 +43,19 @@ public class PileCardDisplay extends CardDisplay {
 		}
 
 		return card.render();
+	}
+
+	@Override
+	public boolean hasOutline(Card card) {
+		return card == null && !this.entryGetter.getTurn().hasPlayableCard();
+	}
+
+	@Override
+	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {
+		if (card == null) {
+			return new DrawCardRegion(minX, minY, maxX, maxY);
+		}
+
+		return null;
 	}
 }

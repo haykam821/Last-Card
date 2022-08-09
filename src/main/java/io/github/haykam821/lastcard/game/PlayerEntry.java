@@ -93,17 +93,29 @@ public class PlayerEntry {
 		}
 	}
 
+	public boolean hasPlayableCard() {	
+		for (Card card : this.getCards()) {
+			if (card.canPlay(this)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private void discardCard(Card card) {
 		this.phase.getDeck().discard(card);
 		this.cards.remove(card);
 	}
 
 	public void drawForTurn() {
-		Card card = this.phase.getDeck().draw();
-		this.cards.add(card);
+		if (this.hasTurn() && !this.hasPlayableCard()) {
+			Card card = this.phase.getDeck().draw();
+			this.cards.add(card);
 
-		this.phase.sendMessageWithException(this.getCardDrewMessage(), this, this.getCardDrewYouMessage(card));
-		this.phase.getTurnManager().cycleTurn();
+			this.phase.sendMessageWithException(this.getCardDrewMessage(), this, this.getCardDrewYouMessage(card));
+			this.phase.getTurnManager().cycleTurn();
+		}
 	}
 
 	private Text getCardDrewMessage() {

@@ -1,6 +1,5 @@
 package io.github.haykam821.lastcard.turn;
 
-import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 
@@ -12,6 +11,10 @@ public class TurnManager {
 
 	public TurnManager(LastCardActivePhase phase) {
 		this.phase = phase;
+	}
+
+	public PlayerEntry getTurn() {
+		return this.turn;
 	}
 
 	public boolean hasTurn(PlayerEntry entry) {
@@ -43,14 +46,6 @@ public class TurnManager {
 
 		this.turn.updateDisplays();
 		this.phase.updatePileDisplay();
-
-		// Draw a card if none are playable
-		for (Card card : this.turn.getCards()) {
-			if (card.canPlay(this.turn)) {
-				return;
-			}
-		}
-		this.turn.drawForTurn();
 	}
 
 	public void skipNextTurn() {
