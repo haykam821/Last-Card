@@ -10,6 +10,7 @@ import io.github.haykam821.lastcard.card.display.PublicCardDisplay;
 import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -108,22 +109,45 @@ public class PlayerEntry {
 		this.cards.remove(card);
 	}
 
+	/**
+	 * Draws a single card from the deck into this player's hand.
+	 * @return the drawn card
+	 */
+	public Card draw() {
+		Card card = this.phase.getDeck().draw();
+		this.cards.add(card);
+		return card;
+	}
+
 	public void drawForTurn() {
 		if (this.hasTurn() && !this.hasPlayableCard()) {
-			Card card = this.phase.getDeck().draw();
-			this.cards.add(card);
+			Card card = this.draw();
 
-			this.phase.sendMessageWithException(this.getCardDrewMessage(), this, this.getCardDrewYouMessage(card));
+			this.phase.sendMessageWithException(this.getCardDrewMessage(1), this, this.getCardDrewYouMessage(card));
 			this.phase.getTurnManager().cycleTurn();
 		}
 	}
 
-	private Text getCardDrewMessage() {
-		return new TranslatableText("text.lastcard.card_drew", this.getName()).formatted(Formatting.GOLD);
+	public Text getCardDrewMessage(int count) {
+		MutableText text;
+
+		if (count == 1) {
+			text = new TranslatableText("text.lastcard.card_drew", this.getName());
+		} else if (count > 1) {
+			text = new TranslatableText("text.lastcard.card_drew.many", this.getName(), count);
+		} else {
+			throw new IllegalStateException("Cannot get negative card drew message");
+		}
+
+		return text.formatted(Formatting.GOLD);
 	}
 
 	private Text getCardDrewYouMessage(Card card) {
 		return new TranslatableText("text.lastcard.card_drew.you", card.getFullName()).formatted(Formatting.GOLD);
+	}
+
+	public Text getCardDrewManyYouMessage(int count) {
+		return new TranslatableText("text.lastcard.card_drew.many.you", count).formatted(Formatting.GOLD);
 	}
 
 	// Displays

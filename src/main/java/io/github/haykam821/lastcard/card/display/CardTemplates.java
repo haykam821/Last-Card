@@ -21,6 +21,9 @@ public final class CardTemplates {
 
 	public static final DrawableCanvas BACK = CardTemplates.load("back");
 
+	public static final DrawableCanvas DRAW_TWO_SYMBOL = CardTemplates.load("draw_two_symbol");
+	public static final DrawableCanvas DRAW_FOUR_SYMBOL = CardTemplates.load("draw_four_symbol");
+
 	public static final DrawableCanvas REVERSE_SYMBOL = CardTemplates.load("reverse_symbol");
 	public static final DrawableCanvas SKIP_SYMBOL = CardTemplates.load("skip_symbol");
 
