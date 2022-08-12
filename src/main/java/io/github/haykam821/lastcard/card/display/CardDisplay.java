@@ -74,7 +74,7 @@ public abstract class CardDisplay implements InteractionCallback {
 				CanvasUtils.draw(this.getCanvas(), x, y, cardCanvas);
 
 				if (this.hasOutline(card)) {
-					CardOutlineRenderer.render(this.getCanvas(), x - 1, y - 1, width + 1, height + 1);
+					CardOutlineRenderer.renderOutside(this.getCanvas(), x, y, width, height);
 				}
 
 				CardRegion region = this.getCardRegion(card, x, y, x + width, x + height);

@@ -11,15 +11,22 @@ public final class CardOutlineRenderer {
 		return;
 	}
 
+	protected static void renderOutside(DrawableCanvas canvas, int minX, int minY, int width, int height) {
+		CardOutlineRenderer.render(canvas, minX - 1, minY - 1, width + 2, height + 2);
+	}
+
 	protected static void render(DrawableCanvas canvas, int minX, int minY, int width, int height) {
-		for (int x = 0; x < width; x++) {
-			canvas.setRaw(minX + x, minY, OUTLINE_RAW_COLOR);
-			canvas.setRaw(minX + x, minY + height, OUTLINE_RAW_COLOR);
+		int maxX = minX + width - 1;
+		int maxY = minY + height - 1;
+
+		for (int x = minX; x <= maxX; x++) {
+			canvas.setRaw(x, minY, OUTLINE_RAW_COLOR);
+			canvas.setRaw(x, maxY, OUTLINE_RAW_COLOR);
 		}
 
-		for (int y = 0; y < height; y++) {
-			canvas.setRaw(minX, minY + y, OUTLINE_RAW_COLOR);
-			canvas.setRaw(minX + width, minY + y, OUTLINE_RAW_COLOR);
+		for (int y = minY + 1; y < maxY; y++) {
+			canvas.setRaw(minX, y, OUTLINE_RAW_COLOR);
+			canvas.setRaw(maxX, y, OUTLINE_RAW_COLOR);
 		}
 	}
 }
