@@ -77,7 +77,7 @@ public abstract class CardDisplay implements InteractionCallback {
 					CardOutlineRenderer.renderOutside(this.getCanvas(), x, y, width, height);
 				}
 
-				CardRegion region = this.getCardRegion(card, x, y, x + width, x + height);
+				CardRegion region = this.getCardRegion(card, x, y, x + width, y + height);
 				if (region != null) {
 					this.regions.add(region);
 				}
@@ -98,7 +98,7 @@ public abstract class CardDisplay implements InteractionCallback {
 		if (entry != null) {
 			for (CardRegion region : this.regions) {
 				if (region.contains(x, y)) {
-					region.onClick(entry);
+					region.onClick(entry, x, y);
 					return;
 				}
 			}

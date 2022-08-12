@@ -8,7 +8,7 @@ public class DrawCardRegion extends CardRegion {
 	}
 
 	@Override
-	public void onClick(PlayerEntry player) {
+	public void onClick(PlayerEntry player, int x, int y) {
 		player.drawForTurn();
 	}
 

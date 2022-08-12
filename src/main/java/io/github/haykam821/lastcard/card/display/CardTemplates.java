@@ -19,6 +19,7 @@ public final class CardTemplates {
 	public static final DrawableCanvas YELLOW_FRONT = CardTemplates.load("yellow_front");
 	public static final DrawableCanvas BLUE_FRONT = CardTemplates.load("blue_front");
 
+	public static final DrawableCanvas WILD_FRONT = CardTemplates.load("wild_front");
 	public static final DrawableCanvas BACK = CardTemplates.load("back");
 
 	public static final DrawableCanvas DRAW_TWO_SYMBOL = CardTemplates.load("draw_two_symbol");

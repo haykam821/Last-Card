@@ -1,4 +1,4 @@
-package io.github.haykam821.lastcard.card;
+package io.github.haykam821.lastcard.card.color;
 
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
-public enum CardColor {
+public enum CardColor implements ColorRepresentation {
 	RED("red", Items.RED_WOOL, Formatting.RED, BossBar.Color.RED, CardTemplates.RED_FRONT, CanvasColor.RED_NORMAL),
 	GREEN("green", Items.GREEN_WOOL, Formatting.GREEN, BossBar.Color.GREEN, CardTemplates.GREEN_FRONT, CanvasColor.GREEN_NORMAL),
 	YELLOW("yellow", Items.YELLOW_WOOL, Formatting.YELLOW, BossBar.Color.YELLOW, CardTemplates.YELLOW_FRONT, CanvasColor.YELLOW_NORMAL),
@@ -38,26 +38,32 @@ public enum CardColor {
 		this.canvasTextColor = canvasTextColor;
 	}
 
+	@Override
 	public Text getName() {
 		return this.name;
 	}
 
+	@Override
 	public Item getItem() {
 		return this.item;
 	}
 
+	@Override
 	public Formatting getFormatting() {
 		return this.formatting;
 	}
 
+	@Override
 	public BossBar.Color getBossBarColor() {
 		return this.bossBarColor;
 	}
 
+	@Override
 	public DrawableCanvas getTemplate() {
 		return this.template;
 	}
 
+	@Override
 	public CanvasColor getCanvasTextColor() {
 		return this.canvasTextColor;
 	}

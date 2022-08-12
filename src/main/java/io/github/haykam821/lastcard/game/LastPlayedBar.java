@@ -1,6 +1,7 @@
 package io.github.haykam821.lastcard.game;
 
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.Text;
@@ -35,11 +36,11 @@ public class LastPlayedBar {
 	}
 
 	private BossBar.Color getColor() {
-		Card previousCard = this.phase.getDeck().getPreviousCard();
-		if (previousCard == null) {
+		CardColor color = this.phase.getDeck().getPreviousColor();
+		if (color == null) {
 			return BossBar.Color.WHITE;
 		}
 
-		return previousCard.getBossBarColor();
+		return color.getBossBarColor();
 	}
 }

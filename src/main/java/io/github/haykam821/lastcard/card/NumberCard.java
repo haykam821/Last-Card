@@ -4,6 +4,8 @@ import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.font.CanvasFont;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
+import io.github.haykam821.lastcard.card.color.CardColor;
+import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.card.display.CardSpacing;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -14,8 +16,8 @@ public class NumberCard extends Card {
 
 	private int value;
 
-	public NumberCard(CardColor color, int value) {
-		super(color);
+	public NumberCard(ColorSelector selector, int value) {
+		super(selector);
 		this.value = value;
 	}
 
@@ -25,14 +27,14 @@ public class NumberCard extends Card {
 	}
 
 	@Override
-	public boolean isMatching(Card card) {
+	public boolean isMatching(Card card, CardColor color) {
 		// Allow value to match in addition to color
 		if (card instanceof NumberCard) {
 			NumberCard numberCard = (NumberCard) card;
 			if (this.value == numberCard.value) return true;
 		}
 
-		return super.isMatching(card);
+		return super.isMatching(card, color);
 	}
 
 	@Override

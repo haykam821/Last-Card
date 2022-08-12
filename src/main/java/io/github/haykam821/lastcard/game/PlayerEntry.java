@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.PrivateCardDisplay;
 import io.github.haykam821.lastcard.card.display.PublicCardDisplay;
@@ -81,9 +82,9 @@ public class PlayerEntry {
 		return this.cards.size();
 	}
 
-	public void playCard(Card card) {
+	public void playCard(Card card, CardColor color) {
 		if (card.canPlay(this)) {
-			this.discardCard(card);
+			this.discardCard(card, color);
 			card.play(this);
 
 			if (this.cards.isEmpty()) {
@@ -104,8 +105,8 @@ public class PlayerEntry {
 		return false;
 	}
 
-	private void discardCard(Card card) {
-		this.phase.getDeck().discard(card);
+	private void discardCard(Card card, CardColor color) {
+		this.phase.getDeck().discard(card, color);
 		this.cards.remove(card);
 	}
 

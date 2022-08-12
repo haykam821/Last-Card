@@ -1,11 +1,14 @@
 package io.github.haykam821.lastcard.card;
 
+import java.util.Objects;
+
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.utils.ViewUtils;
+import io.github.haykam821.lastcard.card.color.CardColor;
+import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.boss.BossBar;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipSection;
 import net.minecraft.text.LiteralText;
@@ -15,14 +18,14 @@ import net.minecraft.util.Formatting;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 
 public abstract class Card {
-	private final CardColor color;
+	private final ColorSelector selector;
 
-	public Card(CardColor color) {
-		this.color = color;
+	public Card(ColorSelector selector) {
+		this.selector = Objects.requireNonNull(selector);
 	}
 
 	public final ItemStack createStack(PlayerEntry player) {
-		ItemStackBuilder builder = ItemStackBuilder.of(this.color.getItem());
+		ItemStackBuilder builder = ItemStackBuilder.of(this.selector.getItem());
 		builder.setName(this.getFullName());
 
 		if (this.canPlay(player)) {
@@ -39,21 +42,23 @@ public abstract class Card {
 
 	public final Text getFullName() {
 		return new LiteralText("")
-			.append(this.color.getName())
+			.append(this.selector.getName())
 			.append(" ")
 			.append(this.getName())
-			.formatted(this.color.getFormatting());
+			.formatted(this.selector.getFormatting());
 	}
 
 	public final boolean canPlay(PlayerEntry player) {
 		if (!player.hasTurn()) return false;
 
-		Card previousCard = player.getPhase().getDeck().getPreviousCard();
-		return previousCard == null || this.isMatching(previousCard);
+		CardDeck deck = player.getPhase().getDeck();
+
+		Card previousCard = deck.getPreviousCard();
+		return previousCard == null || this.isMatching(previousCard, deck.getPreviousColor());
 	}
 
-	public boolean isMatching(Card card) {
-		return this.color == card.color;
+	public boolean isMatching(Card card, CardColor color) {
+		return this.selector.isMatching(color);
 	}
 
 	public void play(PlayerEntry player) {
@@ -61,13 +66,13 @@ public abstract class Card {
 		player.getPhase().updateBar();
 	}
 
-	public BossBar.Color getBossBarColor() {
-		return this.color.getBossBarColor();
+	public ColorSelector getSelector() {
+		return this.selector;
 	}
 
 	public final DrawableCanvas render() {
-		DrawableCanvas canvas = this.color.getTemplate().copy();
-		CanvasColor textColor = this.color.getCanvasTextColor();
+		DrawableCanvas canvas = this.selector.getTemplate().copy();
+		CanvasColor textColor = this.selector.getCanvasTextColor();
 
 		this.renderOverlay(canvas, textColor);
 		this.renderOverlay(ViewUtils.flipY(ViewUtils.flipX(canvas)), textColor);

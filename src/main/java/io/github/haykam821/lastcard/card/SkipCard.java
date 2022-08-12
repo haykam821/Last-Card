@@ -1,6 +1,8 @@
 package io.github.haykam821.lastcard.card;
 
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
+import io.github.haykam821.lastcard.card.color.CardColor;
+import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
@@ -9,8 +11,8 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class SkipCard extends SymbolCard {
-	public SkipCard(CardColor color) {
-		super(color);
+	public SkipCard(ColorSelector selector) {
+		super(selector);
 	}
 
 	@Override
@@ -19,13 +21,13 @@ public class SkipCard extends SymbolCard {
 	}
 
 	@Override
-	public boolean isMatching(Card card) {
+	public boolean isMatching(Card card, CardColor color) {
 		// Allow skip cards to match
 		if (card instanceof SkipCard) {
 			return true;
 		}
 
-		return super.isMatching(card);
+		return super.isMatching(card, color);
 	}
 
 	@Override

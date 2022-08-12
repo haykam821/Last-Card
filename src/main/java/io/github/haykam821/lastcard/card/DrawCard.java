@@ -1,5 +1,7 @@
 package io.github.haykam821.lastcard.card;
 
+import io.github.haykam821.lastcard.card.color.CardColor;
+import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.text.Text;
@@ -7,20 +9,20 @@ import net.minecraft.text.Text;
 public abstract class DrawCard extends SymbolCard {
 	private final int value;
 
-	public DrawCard(CardColor color, int value) {
-		super(color);
+	public DrawCard(ColorSelector selector, int value) {
+		super(selector);
 
 		this.value = value;
 	}
 
 	@Override
-	public boolean isMatching(Card card) {
+	public boolean isMatching(Card card, CardColor color) {
 		// Draw cards can only increase their value
 		if (card instanceof DrawCard) {
 			return this.value >= ((DrawCard) card).value;
 		}
 
-		return super.isMatching(card);
+		return super.isMatching(card, color);
 	}
 
 	@Override

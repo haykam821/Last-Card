@@ -3,11 +3,11 @@ package io.github.haykam821.lastcard.card.display.region;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 
 public abstract class CardRegion {
-	private final int minX;
-	private final int minY;
+	protected final int minX;
+	protected final int minY;
 
-	private final int maxX;
-	private final int maxY;
+	protected final int maxX;
+	protected final int maxY;
 
 	public CardRegion(int minX, int minY, int maxX, int maxY) {
 		this.minX = minX;
@@ -17,7 +17,7 @@ public abstract class CardRegion {
 		this.maxY = maxY;
 	}
 
-	public abstract void onClick(PlayerEntry player);
+	public abstract void onClick(PlayerEntry player, int x, int y);
 
 	public boolean contains(int x, int y) {
 		return x >= this.minX && y >= this.minY && x <= this.maxX && y <= this.maxY;

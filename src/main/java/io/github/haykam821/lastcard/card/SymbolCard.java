@@ -2,11 +2,12 @@ package io.github.haykam821.lastcard.card;
 
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
+import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.card.display.CardSpacing;
 
 public abstract class SymbolCard extends Card {
-	public SymbolCard(CardColor color) {
-		super(color);
+	public SymbolCard(ColorSelector selector) {
+		super(selector);
 	}
 
 	@Override

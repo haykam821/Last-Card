@@ -1,6 +1,7 @@
 package io.github.haykam821.lastcard.card.display.region;
 
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 
 public class PlayCardRegion extends CardRegion {
@@ -13,8 +14,13 @@ public class PlayCardRegion extends CardRegion {
 	}
 
 	@Override
-	public void onClick(PlayerEntry player) {
-		player.playCard(this.card);
+	public void onClick(PlayerEntry player, int x, int y) {
+		ColorSelector selector = this.card.getSelector();
+
+		double relativeX = (x - this.minX) / (double) (this.maxX - this.minX);
+		double relativeY = (y - this.minY) / (double) (this.maxY - this.minY);
+
+		player.playCard(this.card, selector.select(relativeX, relativeY));
 	}
 
 	@Override
