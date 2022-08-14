@@ -13,7 +13,6 @@ import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
@@ -55,11 +54,11 @@ public class PlayerEntry {
 	}
 
 	public Text getWinMessage() {
-		return new TranslatableText("text.lastcard.win", this.getName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.win", this.getName()).formatted(Formatting.GOLD);
 	}
 
 	public Text getNextTurnMessage() {
-		return new TranslatableText("text.lastcard.turn.next", this.getName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.turn.next", this.getName()).formatted(Formatting.GOLD);
 	}
 
 	public Text getName() {
@@ -133,9 +132,9 @@ public class PlayerEntry {
 		MutableText text;
 
 		if (count == 1) {
-			text = new TranslatableText("text.lastcard.card_drew", this.getName());
+			text = Text.translatable("text.lastcard.card_drew", this.getName());
 		} else if (count > 1) {
-			text = new TranslatableText("text.lastcard.card_drew.many", this.getName(), count);
+			text = Text.translatable("text.lastcard.card_drew.many", this.getName(), count);
 		} else {
 			throw new IllegalStateException("Cannot get negative card drew message");
 		}
@@ -144,11 +143,11 @@ public class PlayerEntry {
 	}
 
 	private Text getCardDrewYouMessage(Card card) {
-		return new TranslatableText("text.lastcard.card_drew.you", card.getFullName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.card_drew.you", card.getFullName()).formatted(Formatting.GOLD);
 	}
 
 	public Text getCardDrewManyYouMessage(int count) {
-		return new TranslatableText("text.lastcard.card_drew.many.you", count).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.card_drew.many.you", count).formatted(Formatting.GOLD);
 	}
 
 	// Displays

@@ -7,7 +7,6 @@ import io.github.haykam821.lastcard.card.display.CardTemplates;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class SkipCard extends SymbolCard {
@@ -17,7 +16,7 @@ public class SkipCard extends SymbolCard {
 
 	@Override
 	public Text getName() {
-		return new TranslatableText("text.lastcard.card.skip");
+		return Text.translatable("text.lastcard.card.skip");
 	}
 
 	@Override
@@ -46,11 +45,11 @@ public class SkipCard extends SymbolCard {
 	}
 
 	private Text getTurnSkippedMessage(PlayerEntry player) {
-		return new TranslatableText("text.lastcard.turn.skipped", player.getName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.turn.skipped", player.getName()).formatted(Formatting.GOLD);
 	}
 
 	private Text getTurnSkippedYouMessage() {
-		return new TranslatableText("text.lastcard.turn.skipped.you").formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.turn.skipped.you").formatted(Formatting.GOLD);
 	}
 
 	@Override

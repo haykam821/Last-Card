@@ -7,7 +7,6 @@ import io.github.haykam821.lastcard.card.display.CardTemplates;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.turn.TurnDirection;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class ReverseCard extends SymbolCard {
@@ -17,7 +16,7 @@ public class ReverseCard extends SymbolCard {
 
 	@Override
 	public Text getName() {
-		return new TranslatableText("text.lastcard.card.reverse");
+		return Text.translatable("text.lastcard.card.reverse");
 	}
 
 	@Override
@@ -39,7 +38,7 @@ public class ReverseCard extends SymbolCard {
 	}
 
 	private Text getTurnDirectionMessage(TurnDirection direction) {
-		return new TranslatableText("text.lastcard.turn.direction_changed", direction.getName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.turn.direction_changed", direction.getName()).formatted(Formatting.GOLD);
 	}
 
 	@Override

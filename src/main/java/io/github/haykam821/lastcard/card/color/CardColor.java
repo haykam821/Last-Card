@@ -7,7 +7,6 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public enum CardColor implements ColorRepresentation {
@@ -28,7 +27,7 @@ public enum CardColor implements ColorRepresentation {
 	private final CanvasColor canvasTextColor;
 
 	private CardColor(String key, Item item, Formatting formatting, BossBar.Color bossBarColor, DrawableCanvas template, CanvasColor canvasTextColor) {
-		this.name = new TranslatableText("text.lastcard.card.color." + key);
+		this.name = Text.translatable("text.lastcard.card.color." + key);
 		this.item = item;
 
 		this.formatting = formatting;

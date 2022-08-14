@@ -19,7 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -231,7 +230,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 	private Text getEndingMessage() {
 		if (this.players.isEmpty()) {
-			return new TranslatableText("text.lastcard.no_winners").formatted(Formatting.GOLD);
+			return Text.translatable("text.lastcard.no_winners").formatted(Formatting.GOLD);
 		}
 
 		PlayerEntry winner = this.players.iterator().next();
