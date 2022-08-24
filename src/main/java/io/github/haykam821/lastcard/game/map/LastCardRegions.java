@@ -11,6 +11,7 @@ public final class LastCardRegions {
 	protected static final String PUBLIC_CARD_DISPLAY_MARKER = "public_card_display";
 
 	protected static final String INDEX_KEY = "Index";
+	protected static final String TURN_ORDER_KEY = "TurnOrder";
 	public static final String ROTATION_KEY = "Rotation";
 	
 	private LastCardRegions() {
@@ -34,5 +35,13 @@ public final class LastCardRegions {
 		}
 
 		return region.getData().getFloat(ROTATION_KEY);
+	}
+
+	protected static int getTurnOrder(TemplateRegion region) {
+		if (region.getData() == null) {
+			return 0;
+		}
+
+		return region.getData().getInt(TURN_ORDER_KEY);
 	}
 }

@@ -1,7 +1,10 @@
 package io.github.haykam821.lastcard.game.phase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
@@ -103,26 +106,29 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	public void onEnable() {
 		this.opened = true;
 
-		// Angle calculation
+		// Randomly assign chairs to players
+		List<ServerPlayerEntity> players = Lists.newArrayList(gameSpace.getPlayers());
+		Collections.shuffle(players);
+
 		int index = 0;
 
-		for (ServerPlayerEntity player : gameSpace.getPlayers()) {
+		for (ServerPlayerEntity player : players) {
 			TemplateRegion chair = this.map.getChair(index);
 			TemplateRegion privateCardDisplay = this.map.getPrivateCardDisplay(index);
 			TemplateRegion publicCardDisplay = this.map.getPublicCardDisplay(index);
 
 			PlayerEntry entry = new PlayerEntry(this, player, chair, privateCardDisplay, publicCardDisplay);
 
-			if (index == 0) {
-				this.turnManager.setTurn(entry);
-			}
 			this.players.add(entry);
-
 			this.pileDisplay.add(player);
 
 			entry.spawn();
 			index += 1;
 		}
+
+		// Sort players by turn order
+		this.players.sort(Chair.TURN_ORDER_COMPARATOR);
+		this.turnManager.setTurn(this.players.get(0));
 
 		this.updatePileDisplay();
 		

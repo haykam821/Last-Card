@@ -1,5 +1,8 @@
 package io.github.haykam821.lastcard.game.map;
 
+import java.util.Comparator;
+
+import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.mixin.ArmorStandEntityAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -13,16 +16,23 @@ import net.minecraft.util.math.Direction;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class Chair extends Spawn {
+	public static final Comparator<PlayerEntry> TURN_ORDER_COMPARATOR = Comparator.comparingInt(player -> {
+		return player.getChair().turnOrder;
+	});
+
 	private static final BlockState CHAIR_STATE = Blocks.DARK_OAK_STAIRS.getDefaultState();
 	private static final double MOUNT_Y_OFFSET = 0.25;
 
 	private final BlockPos blockPos;
+	private final int turnOrder;
+
 	private Entity mount; 
 
 	public Chair(TemplateRegion region) {
 		super(region);
 
 		this.blockPos = new BlockPos(this.pos);
+		this.turnOrder = LastCardRegions.getTurnOrder(region);
 	}
 
 	public boolean isAt(BlockPos pos) {
