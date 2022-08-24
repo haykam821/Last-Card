@@ -41,7 +41,7 @@ public abstract class CardDisplay implements InteractionCallback {
 		int z = size.getZ() + 1;
 
 		PlayerCanvas canvas = rotation % 2 == 0 ? DrawableCanvas.create(x, z) : DrawableCanvas.create(z, x);
-		BlockPos pos = rotation == 1 || rotation == 2 ? bounds.max() : bounds.min();
+		BlockPos pos = CardDisplay.getDisplayPos(rotation, bounds);
 
 		this.display = VirtualDisplay.of(canvas, pos, Direction.UP, rotation, false, this);
 	}
@@ -138,5 +138,15 @@ public abstract class CardDisplay implements InteractionCallback {
 
 	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {
 		return null;
+	}
+
+	private static BlockPos getDisplayPos(int rotation, BlockBounds bounds) {
+		BlockPos min = bounds.min();
+		BlockPos max = bounds.max();
+
+		int x = rotation == 0 || rotation == 3 ? min.getX() : max.getX();
+		int z = rotation == 0 || rotation == 1 ? min.getZ() : max.getZ();
+
+		return new BlockPos(x, min.getY(), z);
 	}
 }
