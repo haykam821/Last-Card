@@ -41,10 +41,12 @@ public class TurnManager {
 
 		if (oldTurn != this.turn) {
 			this.sendNextTurnMessage();
-			oldTurn.updateDisplays();
 		}
 
-		this.turn.updateDisplays();
+		for (PlayerEntry player : this.phase.getPlayers()) {
+			player.updateDirtyDisplays();
+		}
+
 		this.phase.updatePileDisplay();
 	}
 

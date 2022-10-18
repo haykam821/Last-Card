@@ -26,6 +26,8 @@ public class PlayerEntry {
 	private final CardDisplay privateDisplay;
 	private final CardDisplay publicDisplay;
 
+	private boolean dirtyDisplays = false;
+
 	public PlayerEntry(LastCardActivePhase phase, ServerPlayerEntity player, TemplateRegion chair, TemplateRegion privateDisplay, TemplateRegion publicDisplay) {
 		this.phase = phase;
 		this.player = player;
@@ -107,7 +109,9 @@ public class PlayerEntry {
 
 	private void discardCard(Card card, CardColor color) {
 		this.phase.getDeck().discard(card, color);
+
 		this.cards.remove(card);
+		this.dirtyDisplays = true;
 	}
 
 	/**
@@ -116,7 +120,10 @@ public class PlayerEntry {
 	 */
 	public Card draw() {
 		Card card = this.phase.getDeck().draw();
+
 		this.cards.add(card);
+		this.dirtyDisplays = true;
+
 		return card;
 	}
 
@@ -172,6 +179,13 @@ public class PlayerEntry {
 	public void updateDisplays() {
 		this.privateDisplay.update();
 		this.publicDisplay.update();
+	}
+
+	public void updateDirtyDisplays() {
+		if (this.dirtyDisplays) {
+			this.updateDisplays();
+			this.dirtyDisplays = false;
+		}
 	}
 
 	@Override
