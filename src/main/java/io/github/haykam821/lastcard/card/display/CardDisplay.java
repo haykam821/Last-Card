@@ -50,11 +50,13 @@ public abstract class CardDisplay implements InteractionCallback {
 		CanvasUtils.clear(this.getCanvas());
 		this.regions.clear();
 
-		int x = CardSpacing.PADDING_X;
+		int x = this.getHorizontalMargin(0);
 		int y = CardSpacing.PADDING_Y;
 
-		int maxX = this.getCanvas().getWidth() - CardSpacing.PADDING_X;
+		int maxX = this.getCanvas().getWidth() - x;
 		int maxHeight = 0;
+
+		int row = 0;
 
 		for (Card card : this.getCards()) {
 			DrawableCanvas cardCanvas = this.getCardCanvas(card);
@@ -63,12 +65,16 @@ public abstract class CardDisplay implements InteractionCallback {
 				int width = cardCanvas.getWidth();
 				int height = cardCanvas.getHeight();
 
-				int newX = x + width + CardSpacing.GAP_X;
-				maxHeight = Math.max(maxHeight, height);
+				if (x + width >= maxX) {
+					row += 1;
+					x = this.getHorizontalMargin(row);
+					y += this.getVerticalSpacing(maxHeight);
 
-				if (newX >= maxX) {
-					x = CardSpacing.PADDING_X;
-					y += maxHeight + CardSpacing.PADDING_Y;
+					maxX = this.getCanvas().getWidth() - x;
+
+					if (y + height >= this.getCanvas().getHeight()) {
+						break;
+					}
 				}
 
 				CanvasUtils.draw(this.getCanvas(), x, y, cardCanvas);
@@ -82,9 +88,8 @@ public abstract class CardDisplay implements InteractionCallback {
 					this.regions.add(region);
 				}
 
-				if (newX < maxX) {
-					x = newX;
-				}
+				maxHeight = Math.max(maxHeight, height);
+				x += this.getHorizontalSpacing(width);
 			}
 		}
 
@@ -130,6 +135,26 @@ public abstract class CardDisplay implements InteractionCallback {
 
 	public final DrawableCanvas getCardCanvas(Card card) {
 		return this.canvasCache.computeIfAbsent(card, this::renderCardCanvas);
+	}
+
+	/**
+	 * {@return the spacing between cards on the X axis}
+	 * @param width the width of the last card
+	 */
+	public int getHorizontalSpacing(int width) {
+		return width + CardSpacing.GAP_X;
+	}
+
+	/**
+	 * {@return the spacing between rows of cards on the Y axis}
+	 * @param maxHeight the height of the tallest card on the last row
+	 */
+	public int getVerticalSpacing(int maxHeight) {
+		return maxHeight + CardSpacing.PADDING_Y;
+	}
+
+	public int getHorizontalMargin(int row) {
+		return CardSpacing.PADDING_X;
 	}
 
 	public boolean hasOutline(Card card) {

@@ -14,4 +14,14 @@ public class PublicCardDisplay extends PlayerCardDisplay {
 	public DrawableCanvas renderCardCanvas(Card card) {
 		return CardTemplates.BACK;
 	}
+
+	@Override
+	public int getHorizontalSpacing(int width) {
+		return width / 4;
+	}
+
+	@Override
+	public int getHorizontalMargin(int row) {
+		return 0;
+	}
 }
