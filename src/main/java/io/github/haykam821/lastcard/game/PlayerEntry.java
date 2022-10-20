@@ -3,6 +3,7 @@ package io.github.haykam821.lastcard.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.pb4.holograms.api.holograms.AbstractHologram;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
@@ -10,6 +11,10 @@ import io.github.haykam821.lastcard.card.display.PrivateCardDisplay;
 import io.github.haykam821.lastcard.card.display.PublicCardDisplay;
 import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
+import net.minecraft.block.entity.SkullBlockEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -23,6 +28,8 @@ public class PlayerEntry {
 	private final List<Card> cards;
 
 	private final Chair chair;
+	private final AbstractHologram statusHologram;
+
 	private final CardDisplay privateDisplay;
 	private final CardDisplay publicDisplay;
 
@@ -40,6 +47,8 @@ public class PlayerEntry {
 		}
 
 		this.chair = new Chair(chair);
+		this.statusHologram = this.chair.createStatusHologram(this.phase.getWorld());
+
 		this.privateDisplay = new PrivateCardDisplay(this, privateDisplay);
 		this.publicDisplay = new PublicCardDisplay(this, publicDisplay);
 	}
@@ -68,6 +77,11 @@ public class PlayerEntry {
 		return this.player.getDisplayName();
 	}
 
+	private Text getTurnName() {
+		Text name = this.getName().shallowCopy().formatted(Formatting.BOLD);
+		return this.hasTurn() ? new TranslatableText("text.lastcard.status.player_turn", name).formatted(Formatting.AQUA) : name;
+	}
+
 	public LastCardActivePhase getPhase() {
 		return this.phase;
 	}
@@ -82,6 +96,13 @@ public class PlayerEntry {
 
 	public int getCardCount() {
 		return this.cards.size();
+	}
+
+	private Text getCardStatus() {
+		int cards = this.getCardCount();
+		String key = "text.lastcard.status.cards" + (cards == 1 ? ".single" : "");
+
+		return new TranslatableText(key, cards);
 	}
 
 	public void playCard(Card card, CardColor color) {
@@ -111,7 +132,7 @@ public class PlayerEntry {
 		this.phase.getDeck().discard(card, color);
 
 		this.cards.remove(card);
-		this.dirtyDisplays = true;
+		this.markDirtyDisplays();
 	}
 
 	/**
@@ -122,7 +143,7 @@ public class PlayerEntry {
 		Card card = this.phase.getDeck().draw();
 
 		this.cards.add(card);
-		this.dirtyDisplays = true;
+		this.markDirtyDisplays();
 
 		return card;
 	}
@@ -172,11 +193,30 @@ public class PlayerEntry {
 	}
 
 	public void destroyDisplays() {
+		this.statusHologram.hide();
 		this.privateDisplay.destroy();
 		this.publicDisplay.destroy();
 	}
 
+	private ItemStack createHeadStack() {
+		ItemStack stack = new ItemStack(Items.PLAYER_HEAD);
+
+		NbtCompound nbt = new NbtCompound();
+		nbt.putString(SkullBlockEntity.SKULL_OWNER_KEY, this.player.getEntityName());
+
+		stack.setNbt(nbt);
+		return stack;
+	}
+
+	private void updateStatus() {
+		this.statusHologram.setItemStack(0, this.createHeadStack(), true);
+
+		this.statusHologram.setText(1, this.getTurnName(), false);
+		this.statusHologram.setText(2, this.getCardStatus(), false);
+	}
+
 	public void updateDisplays() {
+		this.updateStatus();
 		this.privateDisplay.update();
 		this.publicDisplay.update();
 	}
@@ -186,6 +226,10 @@ public class PlayerEntry {
 			this.updateDisplays();
 			this.dirtyDisplays = false;
 		}
+	}
+
+	public void markDirtyDisplays() {
+		this.dirtyDisplays = true;
 	}
 
 	@Override

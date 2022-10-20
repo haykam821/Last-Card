@@ -2,6 +2,10 @@ package io.github.haykam821.lastcard.game.map;
 
 import java.util.Comparator;
 
+import eu.pb4.holograms.api.Holograms;
+import eu.pb4.holograms.api.elements.HologramElement;
+import eu.pb4.holograms.api.holograms.AbstractHologram;
+import eu.pb4.holograms.api.holograms.AbstractHologram.VerticalAlign;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.mixin.ArmorStandEntityAccessor;
 import net.minecraft.block.BlockState;
@@ -65,5 +69,14 @@ public class Chair extends Spawn {
 
 		world.spawnEntity(mount);
 		return mount;
+	}
+
+	public AbstractHologram createStatusHologram(ServerWorld world) {
+		AbstractHologram hologram = Holograms.create(world, this.pos.add(0, MOUNT_Y_OFFSET + 1.8, 0), new HologramElement[0]);
+
+		hologram.setAlignment(VerticalAlign.TOP);
+		hologram.show();
+
+		return hologram;
 	}
 }

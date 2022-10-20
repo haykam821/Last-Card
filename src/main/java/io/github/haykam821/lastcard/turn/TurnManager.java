@@ -43,6 +43,9 @@ public class TurnManager {
 			this.sendNextTurnMessage();
 		}
 
+		oldTurn.markDirtyDisplays();
+		this.turn.markDirtyDisplays();
+
 		for (PlayerEntry player : this.phase.getPlayers()) {
 			player.updateDirtyDisplays();
 		}

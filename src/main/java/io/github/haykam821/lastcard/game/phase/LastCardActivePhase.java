@@ -19,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -35,6 +36,10 @@ import xyz.nucleoid.plasmid.game.GameActivity;
 import xyz.nucleoid.plasmid.game.GameCloseReason;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.common.GlobalWidgets;
+import xyz.nucleoid.plasmid.game.common.team.GameTeam;
+import xyz.nucleoid.plasmid.game.common.team.GameTeamConfig;
+import xyz.nucleoid.plasmid.game.common.team.GameTeamKey;
+import xyz.nucleoid.plasmid.game.common.team.TeamManager;
 import xyz.nucleoid.plasmid.game.event.GameActivityEvents;
 import xyz.nucleoid.plasmid.game.event.GamePlayerEvents;
 import xyz.nucleoid.plasmid.game.player.PlayerOffer;
@@ -47,10 +52,17 @@ import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
 public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvents.Destroy, GameActivityEvents.Enable, GameActivityEvents.Tick, GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GamePlayerEvents.Remove, FluidFlowEvent, ItemPickupEvent, BlockUseEvent {
+	private static final GameTeamKey PLAYERS_KEY = new GameTeamKey("players");
+	private static final GameTeam PLAYERS_TEAM = new GameTeam(PLAYERS_KEY, GameTeamConfig.builder()
+		.setCollision(AbstractTeam.CollisionRule.NEVER)
+		.setNameTagVisibility(AbstractTeam.VisibilityRule.NEVER)
+		.build());
+
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 	private final LastCardConfig config;
 	private final LastCardMap map;
+	private final TeamManager teams;
 	private final LastPlayedBar bar;
 	private final List<PlayerEntry> players;
 	private final CardDeck deck = new CardDeck();
@@ -59,12 +71,13 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	private boolean singleplayer;
 	private boolean opened;
 
-	public LastCardActivePhase(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map, GlobalWidgets widgets) {
+	public LastCardActivePhase(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map, TeamManager teams, GlobalWidgets widgets) {
 		this.gameSpace = gameSpace;
 		this.world = world;
 		this.config = config;
 		this.map = map;
 
+		this.teams = teams;
 		this.bar = new LastPlayedBar(this, widgets);
 
 		int playerCount = this.gameSpace.getPlayers().size();
@@ -76,8 +89,11 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 	public static void open(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map) {
 		gameSpace.setActivity(activity -> {
+			TeamManager teams = TeamManager.addTo(activity);
+			teams.addTeam(PLAYERS_TEAM);
+
 			GlobalWidgets widgets = GlobalWidgets.addTo(activity);
-			LastCardActivePhase phase = new LastCardActivePhase(gameSpace, world, config, map, widgets);
+			LastCardActivePhase phase = new LastCardActivePhase(gameSpace, world, config, map, teams, widgets);
 
 			LastCardActivePhase.setRules(activity);
 			activity.allow(GameRuleType.DISMOUNT_VEHICLE);
@@ -121,6 +137,8 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 			this.players.add(entry);
 			this.pileDisplay.add(player);
+
+			teams.addPlayerTo(player, PLAYERS_KEY);
 
 			entry.spawn();
 			index += 1;
