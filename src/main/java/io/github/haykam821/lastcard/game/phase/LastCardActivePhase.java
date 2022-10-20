@@ -66,7 +66,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	private final LastPlayedBar bar;
 	private final List<PlayerEntry> players;
 	private final CardDeck deck = new CardDeck();
-	private final TurnManager turnManager = new TurnManager(this);
+	private final TurnManager turnManager;
 	private final CardDisplay pileDisplay;
 	private boolean singleplayer;
 	private boolean opened;
@@ -84,6 +84,8 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 		this.players = new ArrayList<>(playerCount);
 		this.singleplayer = playerCount == 1;
 
+		TemplateRegion pileCardDisplay = this.map.getPileCardDisplay();
+		this.turnManager = new TurnManager(this, pileCardDisplay.getBounds().centerBottom());
 		this.pileDisplay = new PileCardDisplay(this.getDeck(), this, this.map.getPileCardDisplay());
 	}
 
@@ -164,6 +166,8 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 	@Override
 	public void onTick() {
+		this.turnManager.tick();
+
 		// End early if there are not enough players to continue
 		if (this.shouldEndEarly()) {
 			this.endWithMessage(this.getEndingMessage());
