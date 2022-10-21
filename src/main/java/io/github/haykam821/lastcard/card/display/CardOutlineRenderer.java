@@ -11,7 +11,7 @@ public final class CardOutlineRenderer {
 		return;
 	}
 
-	protected static void renderOutside(DrawableCanvas canvas, int minX, int minY, int width, int height) {
+	public static void renderOutside(DrawableCanvas canvas, int minX, int minY, int width, int height) {
 		CardOutlineRenderer.render(canvas, minX - 1, minY - 1, width + 2, height + 2);
 	}
 

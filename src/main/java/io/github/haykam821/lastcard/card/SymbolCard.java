@@ -3,7 +3,7 @@ package io.github.haykam821.lastcard.card;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
-import io.github.haykam821.lastcard.card.display.CardSpacing;
+import io.github.haykam821.lastcard.card.display.layout.CardSpacing;
 
 public abstract class SymbolCard extends Card {
 	public SymbolCard(ColorSelector selector) {

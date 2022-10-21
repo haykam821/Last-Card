@@ -11,6 +11,9 @@ import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay.InteractionCallback;
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.display.layout.CardLayout;
+import io.github.haykam821.lastcard.card.display.layout.CardSpacing;
+import io.github.haykam821.lastcard.card.display.layout.LayoutEntry;
 import io.github.haykam821.lastcard.card.display.region.CardRegion;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.map.LastCardRegions;
@@ -47,53 +50,28 @@ public abstract class CardDisplay implements InteractionCallback {
 	}
 
 	public void update() {
-		CanvasUtils.clear(this.getCanvas());
+		PlayerCanvas canvas = this.getCanvas();
+
+		CanvasUtils.clear(canvas);
 		this.regions.clear();
 
-		int x = this.getHorizontalMargin(0);
-		int y = CardSpacing.PADDING_Y;
+		CardLayout layout = new CardLayout(this);
+		layout.addCards(canvas, this.getCards());
 
-		int maxX = this.getCanvas().getWidth() - x;
-		int maxHeight = 0;
+		int startX = (canvas.getWidth() - layout.getTotalWidth()) / 2;
+		int startY = (canvas.getHeight() - layout.getTotalHeight()) / 2;
 
-		int row = 0;
+		for (LayoutEntry entry : layout.getEntries()) {
+			Card card = entry.card();
+			entry.render(canvas, this.getCardCanvas(card), this.hasOutline(card), startX, startY);
 
-		for (Card card : this.getCards()) {
-			DrawableCanvas cardCanvas = this.getCardCanvas(card);
-
-			if (cardCanvas != null) {
-				int width = cardCanvas.getWidth();
-				int height = cardCanvas.getHeight();
-
-				if (x + width >= maxX) {
-					row += 1;
-					x = this.getHorizontalMargin(row);
-					y += this.getVerticalSpacing(maxHeight);
-
-					maxX = this.getCanvas().getWidth() - x;
-
-					if (y + height >= this.getCanvas().getHeight()) {
-						break;
-					}
-				}
-
-				CanvasUtils.draw(this.getCanvas(), x, y, cardCanvas);
-
-				if (this.hasOutline(card)) {
-					CardOutlineRenderer.renderOutside(this.getCanvas(), x, y, width, height);
-				}
-
-				CardRegion region = this.getCardRegion(card, x, y, x + width, y + height);
-				if (region != null) {
-					this.regions.add(region);
-				}
-
-				maxHeight = Math.max(maxHeight, height);
-				x += this.getHorizontalSpacing(width);
+			CardRegion region = this.getCardRegion(card, startX + entry.x(), startY + entry.y(), startX + entry.maxX(), startY + entry.maxY());
+			if (region != null) {
+				this.regions.add(region);
 			}
 		}
 
-		this.getCanvas().sendUpdates();
+		canvas.sendUpdates();
 	}
 
 	@Override
