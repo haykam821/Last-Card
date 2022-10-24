@@ -160,7 +160,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 			player.updateDisplays();
 		}
 
-		this.turnManager.sendNextTurnMessage();
+		this.turnManager.sendNextTurnEffects();
 		this.updateBar();
 	}
 

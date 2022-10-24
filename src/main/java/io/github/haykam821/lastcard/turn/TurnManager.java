@@ -58,7 +58,7 @@ public class TurnManager {
 		this.skipNextTurn = false;
 
 		if (oldTurn != this.turn) {
-			this.sendNextTurnMessage();
+			this.sendNextTurnEffects();
 		}
 
 		oldTurn.markDirtyDisplays();
@@ -79,9 +79,10 @@ public class TurnManager {
 		return this.direction = this.direction.getOpposite();
 	}
 
-	public void sendNextTurnMessage() {
+	public void sendNextTurnEffects() {
 		if (this.turn != null) {
 			this.phase.sendMessage(this.turn.getNextTurnMessage());
+			TurnSounds.playTurnSounds(this.turn.getPlayer());
 		}
 	}
 
