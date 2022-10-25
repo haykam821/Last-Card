@@ -8,7 +8,8 @@ import com.google.common.collect.Lists;
 
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
-import io.github.haykam821.lastcard.card.display.PileCardDisplay;
+import io.github.haykam821.lastcard.card.display.pile.PileCardDisplay;
+import io.github.haykam821.lastcard.card.display.pile.PrivatePileCardDisplay;
 import io.github.haykam821.lastcard.game.LastCardConfig;
 import io.github.haykam821.lastcard.game.LastPlayedBar;
 import io.github.haykam821.lastcard.game.PlayerEntry;
@@ -30,6 +31,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.map_templates.TemplateRegion;
 import xyz.nucleoid.plasmid.game.GameActivity;
@@ -67,7 +69,8 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	private final List<PlayerEntry> players;
 	private final CardDeck deck = new CardDeck();
 	private final TurnManager turnManager;
-	private final CardDisplay pileDisplay;
+	private final CardDisplay privatePileDisplay;
+	private final CardDisplay publicPileDisplay;
 	private boolean singleplayer;
 	private boolean opened;
 
@@ -85,8 +88,12 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 		this.singleplayer = playerCount == 1;
 
 		TemplateRegion pileCardDisplay = this.map.getPileCardDisplay();
-		this.turnManager = new TurnManager(this, pileCardDisplay.getBounds().centerBottom());
-		this.pileDisplay = new PileCardDisplay(this.getDeck(), this, this.map.getPileCardDisplay());
+		Vec3d particleOrigin = pileCardDisplay.getBounds().centerBottom();
+
+		this.privatePileDisplay = new PrivatePileCardDisplay(this.getDeck(), this, pileCardDisplay);
+		this.publicPileDisplay = new PileCardDisplay(this.getDeck(), this, pileCardDisplay);
+
+		this.turnManager = new TurnManager(this, particleOrigin, this.privatePileDisplay, this.publicPileDisplay);
 	}
 
 	public static void open(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map) {
@@ -117,7 +124,8 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	// Listeners
 	@Override
 	public void onDestroy(GameCloseReason reason) {
-		this.pileDisplay.destroy();
+		this.privatePileDisplay.destroy();
+		this.publicPileDisplay.destroy();
 	}
 
 	@Override
@@ -138,7 +146,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 			PlayerEntry entry = new PlayerEntry(this, player, chair, privateCardDisplay, publicCardDisplay);
 
 			this.players.add(entry);
-			this.pileDisplay.add(player);
+			this.publicPileDisplay.add(player);
 
 			teams.addPlayerTo(player, PLAYERS_KEY);
 
@@ -183,7 +191,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	@Override
 	public PlayerOfferResult onOfferPlayer(PlayerOffer offer) {
 		return this.map.getWaitingSpawn().acceptOffer(offer, this.world, GameMode.SPECTATOR).and(() -> {
-			this.pileDisplay.add(offer.player());
+			this.publicPileDisplay.add(offer.player());
 
 			for (PlayerEntry player : this.players) {
 				player.addDisplay(offer.player());
@@ -209,7 +217,8 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 		PlayerEntry entry = this.getPlayerEntry(player);
 		if (entry == null) return;
 
-		this.pileDisplay.remove(player);
+		this.privatePileDisplay.remove(player);
+		this.publicPileDisplay.remove(player);
 
 		for (ServerPlayerEntity viewer : this.gameSpace.getPlayers()) {
 			entry.removeDisplay(viewer);
@@ -349,7 +358,8 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	}
 
 	public void updatePileDisplay() {
-		this.pileDisplay.update();
+		this.privatePileDisplay.update();
+		this.publicPileDisplay.update();
 	}
 
 	protected static void setRules(GameActivity activity) {

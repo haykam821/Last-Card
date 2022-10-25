@@ -102,6 +102,11 @@ public abstract class CardDisplay implements InteractionCallback {
 		this.getCanvas().removePlayer(viewer);
 	}
 
+	public void moveViewer(ServerPlayerEntity player, CardDisplay toDisplay) {
+		this.remove(player);
+		toDisplay.add(player);
+	}
+
 	public final void destroy() {
 		this.display.destroy();
 		this.getCanvas().destroy();

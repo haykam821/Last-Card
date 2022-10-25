@@ -1,6 +1,7 @@
-package io.github.haykam821.lastcard.card.display;
+package io.github.haykam821.lastcard.card.display.player;
 
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import xyz.nucleoid.map_templates.TemplateRegion;
 

@@ -1,6 +1,7 @@
 package io.github.haykam821.lastcard.turn;
 
 import io.github.haykam821.lastcard.card.color.CardColor;
+import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.particle.ParticleEffect;
@@ -19,6 +20,10 @@ public class TurnManager {
 	private static final int PARTICLE_UPDATE_RATE = 1;
 
 	private final LastCardActivePhase phase;
+
+	private final CardDisplay privatePileDisplay;
+	private final CardDisplay publicPileDisplay;
+
 	private PlayerEntry turn;
 	private boolean skipNextTurn = false;
 	private TurnDirection direction = TurnDirection.CLOCKWISE;
@@ -26,9 +31,12 @@ public class TurnManager {
 	private final Vec3d particleOrigin;
 	private int ticks = 0;
 
-	public TurnManager(LastCardActivePhase phase, Vec3d particleOrigin) {
+	public TurnManager(LastCardActivePhase phase, Vec3d particleOrigin, CardDisplay privatePileDisplay, CardDisplay publicPileDisplay) {
 		this.phase = phase;
 		this.particleOrigin = particleOrigin;
+
+		this.privatePileDisplay = privatePileDisplay;
+		this.publicPileDisplay = publicPileDisplay;
 	}
 
 	public PlayerEntry getTurn() {
@@ -59,6 +67,9 @@ public class TurnManager {
 
 		if (oldTurn != this.turn) {
 			this.sendNextTurnEffects();
+
+			this.privatePileDisplay.moveViewer(oldTurn.getPlayer(), this.publicPileDisplay);
+			this.publicPileDisplay.moveViewer(this.turn.getPlayer(), this.privatePileDisplay);
 		}
 
 		oldTurn.markDirtyDisplays();
