@@ -168,6 +168,12 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	public void onTick() {
 		this.turnManager.tick();
 
+		for (ServerPlayerEntity player : this.gameSpace.getPlayers()) {
+			if (!this.map.contains(player)) {
+				this.spawn(player);
+			}
+		}
+
 		// End early if there are not enough players to continue
 		if (this.shouldEndEarly()) {
 			this.endWithMessage(this.getEndingMessage());
@@ -192,7 +198,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 	@Override
 	public ActionResult onDeath(ServerPlayerEntity player, DamageSource source) {
-		LastCardActivePhase.spawn(this.getWorld(), this.map, player);
+		this.spawn(player);
 		return ActionResult.FAIL;
 	}
 
@@ -244,6 +250,15 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	}
 
 	// Utilities
+	public void spawn(ServerPlayerEntity player) {
+		PlayerEntry entry = this.getPlayerEntry(player);
+		
+		if (entry == null) {
+			this.map.getWaitingSpawn().teleport(player);
+		} else {
+			entry.spawn();
+		}
+	}
 
 	public void updateBar() {
 		this.bar.update();
@@ -350,9 +365,5 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 		activity.deny(GameRuleType.PORTALS);
 		activity.deny(GameRuleType.PVP);
 		activity.deny(GameRuleType.THROW_ITEMS);
-	}
-
-	protected static void spawn(ServerWorld world, LastCardMap map, ServerPlayerEntity player) {
-		map.getWaitingSpawn().teleport(player);
 	}
 }

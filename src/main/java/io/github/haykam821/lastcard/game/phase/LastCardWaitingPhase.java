@@ -29,7 +29,7 @@ import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GameActivityEvents.RequestStart, FluidFlowEvent, ItemPickupEvent {
+public class LastCardWaitingPhase implements GamePlayerEvents.Offer, GameActivityEvents.Tick, PlayerDamageEvent, PlayerDeathEvent, GameActivityEvents.RequestStart, FluidFlowEvent, ItemPickupEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 
@@ -62,6 +62,7 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 
 			// Listeners
 			activity.listen(GamePlayerEvents.OFFER, phase);
+			activity.listen(GameActivityEvents.TICK, phase);
 			activity.listen(PlayerDamageEvent.EVENT, phase);
 			activity.listen(PlayerDeathEvent.EVENT, phase);
 			activity.listen(GameActivityEvents.REQUEST_START, phase);
@@ -86,13 +87,22 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 	}
 
 	@Override
+	public void onTick() {
+		for (ServerPlayerEntity player : this.gameSpace.getPlayers()) {
+			if (!this.map.contains(player)) {
+				this.spawn(player);
+			}
+		}
+	}
+
+	@Override
 	public ActionResult onDamage(ServerPlayerEntity player, DamageSource source, float amount) {
 		return ActionResult.FAIL;
 	}
 
 	@Override
 	public ActionResult onDeath(ServerPlayerEntity player, DamageSource source) {
-		LastCardActivePhase.spawn(this.world, this.map, player);
+		this.spawn(player);
 		return ActionResult.FAIL;
 	}
 
@@ -100,5 +110,9 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 	public GameResult onRequestStart() {
 		LastCardActivePhase.open(this.gameSpace, this.world, this.config, this.map);
 		return GameResult.ok();
+	}
+
+	private void spawn(ServerPlayerEntity player) {
+		this.map.getWaitingSpawn().teleport(player);
 	}
 }
