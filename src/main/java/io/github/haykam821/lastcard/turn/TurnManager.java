@@ -2,8 +2,9 @@ package io.github.haykam821.lastcard.turn;
 
 import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
-import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
+import net.minecraft.SharedConstants;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
@@ -19,14 +20,17 @@ public class TurnManager {
 	private static final double PARTICLE_SPEED = 1 / 15d;
 	private static final int PARTICLE_UPDATE_RATE = 1;
 
+	private static final int VIRTUAL_ACTION_TURN_TICKS = SharedConstants.TICKS_PER_SECOND;
+
 	private final LastCardActivePhase phase;
 
 	private final CardDisplay privatePileDisplay;
 	private final CardDisplay publicPileDisplay;
 
-	private PlayerEntry turn;
+	private AbstractPlayerEntry turn;
 	private boolean skipNextTurn = false;
 	private TurnDirection direction = TurnDirection.CLOCKWISE;
+	private int turnTicks = 0;
 
 	private final Vec3d particleOrigin;
 	private int ticks = 0;
@@ -39,15 +43,15 @@ public class TurnManager {
 		this.publicPileDisplay = publicPileDisplay;
 	}
 
-	public PlayerEntry getTurn() {
+	public AbstractPlayerEntry getTurn() {
 		return this.turn;
 	}
 
-	public boolean hasTurn(PlayerEntry entry) {
+	public boolean hasTurn(AbstractPlayerEntry entry) {
 		return this.turn == entry;
 	}
 
-	public void setTurn(PlayerEntry turn) {
+	public void setTurn(AbstractPlayerEntry turn) {
 		this.turn = turn;
 	}
 
@@ -60,10 +64,11 @@ public class TurnManager {
 	public void cycleTurn() {
 		if (this.phase.getPlayers().isEmpty()) return;
 
-		PlayerEntry oldTurn = this.turn;
+		AbstractPlayerEntry oldTurn = this.turn;
 
 		this.turn = this.phase.getPlayerEntry(this.getNextTurnIndex(true));
 		this.skipNextTurn = false;
+		this.turnTicks = 0;
 
 		if (oldTurn != this.turn) {
 			this.sendNextTurnEffects();
@@ -75,7 +80,7 @@ public class TurnManager {
 		oldTurn.markDirtyDisplays();
 		this.turn.markDirtyDisplays();
 
-		for (PlayerEntry player : this.phase.getPlayers()) {
+		for (AbstractPlayerEntry player : this.phase.getPlayers()) {
 			player.updateDirtyDisplays();
 		}
 
@@ -98,6 +103,12 @@ public class TurnManager {
 	}
 
 	public void tick() {
+		this.turnTicks += 1;
+
+		if (this.turnTicks == VIRTUAL_ACTION_TURN_TICKS && this.turn != null) {
+			this.turn.performVirtualAction();
+		}
+
 		this.ticks += this.direction.multiply(-1);
 
 		if (this.ticks % PARTICLE_UPDATE_RATE == 0) {

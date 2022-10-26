@@ -6,7 +6,7 @@ import eu.pb4.holograms.api.Holograms;
 import eu.pb4.holograms.api.elements.HologramElement;
 import eu.pb4.holograms.api.holograms.AbstractHologram;
 import eu.pb4.holograms.api.holograms.AbstractHologram.VerticalAlign;
-import io.github.haykam821.lastcard.game.PlayerEntry;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import io.github.haykam821.lastcard.mixin.ArmorStandEntityAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -20,7 +20,7 @@ import net.minecraft.util.math.Direction;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class Chair extends Spawn {
-	public static final Comparator<PlayerEntry> TURN_ORDER_COMPARATOR = Comparator.comparingInt(player -> {
+	public static final Comparator<AbstractPlayerEntry> TURN_ORDER_COMPARATOR = Comparator.comparingInt(player -> {
 		return player.getChair().turnOrder;
 	});
 

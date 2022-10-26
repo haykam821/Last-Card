@@ -3,11 +3,11 @@ package io.github.haykam821.lastcard.card.display.player;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
-import io.github.haykam821.lastcard.game.PlayerEntry;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class PublicCardDisplay extends PlayerCardDisplay {
-	public PublicCardDisplay(PlayerEntry player, TemplateRegion region) {
+	public PublicCardDisplay(AbstractPlayerEntry player, TemplateRegion region) {
 		super(player, region);
 	}
 

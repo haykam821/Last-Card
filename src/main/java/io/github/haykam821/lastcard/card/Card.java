@@ -7,7 +7,7 @@ import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.utils.ViewUtils;
 import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
-import io.github.haykam821.lastcard.game.PlayerEntry;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipSection;
@@ -24,7 +24,7 @@ public abstract class Card {
 		this.selector = Objects.requireNonNull(selector);
 	}
 
-	public final ItemStack createStack(PlayerEntry player) {
+	public final ItemStack createStack(AbstractPlayerEntry player) {
 		ItemStackBuilder builder = ItemStackBuilder.of(this.selector.getItem());
 		builder.setName(this.getFullName());
 
@@ -48,7 +48,7 @@ public abstract class Card {
 			.formatted(this.selector.getFormatting());
 	}
 
-	public final boolean canPlay(PlayerEntry player) {
+	public final boolean canPlay(AbstractPlayerEntry player) {
 		if (!player.hasTurn()) return false;
 
 		CardDeck deck = player.getPhase().getDeck();
@@ -61,7 +61,7 @@ public abstract class Card {
 		return this.selector.isMatching(color);
 	}
 
-	public void play(PlayerEntry player) {
+	public void play(AbstractPlayerEntry player) {
 		player.getPhase().sendMessageWithException(this.getCardPlayedMessage(player), player, this.getCardPlayedYouMessage());
 		player.getPhase().updateBar();
 	}
@@ -82,7 +82,7 @@ public abstract class Card {
 
 	public abstract void renderOverlay(DrawableCanvas canvas, CanvasColor textColor);
 
-	private Text getCardPlayedMessage(PlayerEntry player) {
+	private Text getCardPlayedMessage(AbstractPlayerEntry player) {
 		return new TranslatableText("text.lastcard.card_played", player.getName(), this.getFullName()).formatted(Formatting.GOLD);
 	}
 

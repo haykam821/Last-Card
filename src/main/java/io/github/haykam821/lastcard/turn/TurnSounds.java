@@ -19,6 +19,10 @@ public class TurnSounds {
 	}
 
 	protected static void playTurnSounds(ServerPlayerEntity player) {
+		if (player == null) {
+			return;
+		}
+
 		TurnSounds.playTurnSound(player, TURN_SOUND_BASE_PITCH);
 		TurnSounds.playTurnSound(player, TURN_SOUND_BASE_PITCH + TURN_SOUND_PITCH_STEP);
 		TurnSounds.playTurnSound(player, TURN_SOUND_BASE_PITCH + TURN_SOUND_PITCH_STEP * 2);
