@@ -33,7 +33,7 @@ public abstract class AbstractPlayerEntry extends PlayerIdentifiable {
 			this.cards.add(this.phase.getDeck().draw());
 		}
 
-		this.chair = new Chair(chair);
+		this.chair = new Chair(chair, phase.getConfig().getChairBlock());
 		this.statusHologram = this.chair.createStatusHologram(this.phase.getWorld());
 
 		this.publicDisplay = new PublicCardDisplay(this, publicDisplay);

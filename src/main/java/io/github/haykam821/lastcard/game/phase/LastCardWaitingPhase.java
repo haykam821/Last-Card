@@ -1,5 +1,7 @@
 package io.github.haykam821.lastcard.game.phase;
 
+import java.util.Random;
+
 import io.github.haykam821.lastcard.game.LastCardConfig;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
 import io.github.haykam821.lastcard.game.map.LastCardMapBuilder;
@@ -7,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
@@ -47,11 +50,15 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, GameActivit
 	public static GameOpenProcedure open(GameOpenContext<LastCardConfig> context) {
 		LastCardConfig config = context.config();
 
+		MinecraftServer server = context.server();
+		Random random = server.getOverworld().getRandom();
+
 		LastCardMapBuilder mapBuilder = new LastCardMapBuilder(config);
-		LastCardMap map = mapBuilder.create(context.server());
+		LastCardMap map = mapBuilder.create(server);
 
 		RuntimeWorldConfig worldConfig = new RuntimeWorldConfig()
-			.setGenerator(map.createGenerator(context.server()));
+			.setTimeOfDay(config.getTimeOfDay().get(random))
+			.setGenerator(map.createGenerator(server));
 
 		return context.openWithWorld(worldConfig, (activity, world) -> {
 			LastCardWaitingPhase phase = new LastCardWaitingPhase(activity.getGameSpace(), world, config, map);

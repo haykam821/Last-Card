@@ -7,6 +7,7 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
+import io.github.haykam821.lastcard.Main;
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.pile.PileCardDisplay;
@@ -392,5 +393,6 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 		activity.deny(GameRuleType.PORTALS);
 		activity.deny(GameRuleType.PVP);
 		activity.deny(GameRuleType.THROW_ITEMS);
+		activity.deny(Main.WITHER_ROSE_WITHER_EFFECT);
 	}
 }
