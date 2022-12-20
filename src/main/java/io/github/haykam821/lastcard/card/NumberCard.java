@@ -6,7 +6,7 @@ import eu.pb4.mapcanvas.api.font.CanvasFont;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
-import io.github.haykam821.lastcard.card.display.CardSpacing;
+import io.github.haykam821.lastcard.card.display.layout.CardSpacing;
 import net.minecraft.text.Text;
 
 public class NumberCard extends Card {

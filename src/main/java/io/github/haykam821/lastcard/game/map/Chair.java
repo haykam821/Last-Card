@@ -1,8 +1,14 @@
 package io.github.haykam821.lastcard.game.map;
 
+import java.util.Comparator;
+
+import eu.pb4.holograms.api.Holograms;
+import eu.pb4.holograms.api.elements.HologramElement;
+import eu.pb4.holograms.api.holograms.AbstractHologram;
+import eu.pb4.holograms.api.holograms.AbstractHologram.VerticalAlign;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import io.github.haykam821.lastcard.mixin.ArmorStandEntityAccessor;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -10,19 +16,30 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.gen.stateprovider.BlockStateProvider;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class Chair extends Spawn {
-	private static final BlockState CHAIR_STATE = Blocks.DARK_OAK_STAIRS.getDefaultState();
+	public static final Comparator<AbstractPlayerEntry> TURN_ORDER_COMPARATOR = Comparator.comparingInt(player -> {
+		return player.getChair().turnOrder;
+	});
+
 	private static final double MOUNT_Y_OFFSET = 0.25;
 
 	private final BlockPos blockPos;
+	private final int turnOrder;
+
+	private final BlockStateProvider chairBlock;
+
 	private Entity mount; 
 
-	public Chair(TemplateRegion region) {
+	public Chair(TemplateRegion region, BlockStateProvider chairBlock) {
 		super(region);
 
 		this.blockPos = new BlockPos(this.pos);
+		this.turnOrder = LastCardRegions.getTurnOrder(region);
+
+		this.chairBlock = chairBlock;
 	}
 
 	public boolean isAt(BlockPos pos) {
@@ -31,15 +48,16 @@ public class Chair extends Spawn {
 
 	@Override
 	public void teleport(ServerPlayerEntity player) {
+		ServerWorld world = player.getWorld();
 		if (this.mount == null) {
-			this.mount = this.createMount(player.getWorld());
+			this.mount = this.createMount(world);
 		}
 
 		if (player.getWorld().isAir(this.blockPos)) {
 			Direction facing = Direction.fromRotation(this.rotation).getOpposite();
-			BlockState state = CHAIR_STATE.with(StairsBlock.FACING, facing);
+			BlockState state = this.chairBlock.getBlockState(world.getRandom(), this.blockPos).with(StairsBlock.FACING, facing);
 
-			player.getWorld().setBlockState(this.blockPos, state);
+			world.setBlockState(this.blockPos, state);
 		}
 
 		super.teleport(player);
@@ -55,5 +73,14 @@ public class Chair extends Spawn {
 
 		world.spawnEntity(mount);
 		return mount;
+	}
+
+	public AbstractHologram createStatusHologram(ServerWorld world) {
+		AbstractHologram hologram = Holograms.create(world, this.pos.add(0, MOUNT_Y_OFFSET + 1.8, 0), new HologramElement[0]);
+
+		hologram.setAlignment(VerticalAlign.TOP);
+		hologram.show();
+
+		return hologram;
 	}
 }

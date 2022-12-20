@@ -11,10 +11,13 @@ import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay.InteractionCallback;
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.display.layout.CardLayout;
+import io.github.haykam821.lastcard.card.display.layout.CardSpacing;
+import io.github.haykam821.lastcard.card.display.layout.LayoutEntry;
 import io.github.haykam821.lastcard.card.display.region.CardRegion;
-import io.github.haykam821.lastcard.game.PlayerEntry;
 import io.github.haykam821.lastcard.game.map.LastCardRegions;
 import io.github.haykam821.lastcard.game.phase.PlayerEntryGetter;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -41,59 +44,39 @@ public abstract class CardDisplay implements InteractionCallback {
 		int z = size.getZ() + 1;
 
 		PlayerCanvas canvas = rotation % 2 == 0 ? DrawableCanvas.create(x, z) : DrawableCanvas.create(z, x);
-		BlockPos pos = rotation == 1 || rotation == 2 ? bounds.max() : bounds.min();
+		BlockPos pos = CardDisplay.getDisplayPos(rotation, bounds);
 
 		this.display = VirtualDisplay.of(canvas, pos, Direction.UP, rotation, false, this);
 	}
 
 	public void update() {
-		CanvasUtils.clear(this.getCanvas());
+		PlayerCanvas canvas = this.getCanvas();
+
+		CanvasUtils.clear(canvas);
 		this.regions.clear();
 
-		int x = CardSpacing.PADDING_X;
-		int y = CardSpacing.PADDING_Y;
+		CardLayout layout = new CardLayout(this);
+		layout.addCards(canvas, this.getCards());
 
-		int maxX = this.getCanvas().getWidth() - CardSpacing.PADDING_X;
-		int maxHeight = 0;
+		int startX = (canvas.getWidth() - layout.getTotalWidth()) / 2;
+		int startY = (canvas.getHeight() - layout.getTotalHeight()) / 2;
 
-		for (Card card : this.getCards()) {
-			DrawableCanvas cardCanvas = this.getCardCanvas(card);
+		for (LayoutEntry entry : layout.getEntries()) {
+			Card card = entry.card();
+			entry.render(canvas, this.getCardCanvas(card), this.hasOutline(card), startX, startY);
 
-			if (cardCanvas != null) {
-				int width = cardCanvas.getWidth();
-				int height = cardCanvas.getHeight();
-
-				int newX = x + width + CardSpacing.GAP_X;
-				maxHeight = Math.max(maxHeight, height);
-
-				if (newX >= maxX) {
-					x = CardSpacing.PADDING_X;
-					y += maxHeight + CardSpacing.PADDING_Y;
-				}
-
-				CanvasUtils.draw(this.getCanvas(), x, y, cardCanvas);
-
-				if (this.hasOutline(card)) {
-					CardOutlineRenderer.renderOutside(this.getCanvas(), x, y, width, height);
-				}
-
-				CardRegion region = this.getCardRegion(card, x, y, x + width, y + height);
-				if (region != null) {
-					this.regions.add(region);
-				}
-
-				if (newX < maxX) {
-					x = newX;
-				}
+			CardRegion region = this.getCardRegion(card, startX + entry.x(), startY + entry.y(), startX + entry.maxX(), startY + entry.maxY());
+			if (region != null) {
+				this.regions.add(region);
 			}
 		}
 
-		this.getCanvas().sendUpdates();
+		canvas.sendUpdates();
 	}
 
 	@Override
 	public void onClick(ServerPlayerEntity player, int x, int y) {
-		PlayerEntry entry = this.entryGetter.getPlayerEntry(player);
+		AbstractPlayerEntry entry = this.entryGetter.getPlayerEntry(player);
 
 		if (entry != null) {
 			for (CardRegion region : this.regions) {
@@ -119,6 +102,13 @@ public abstract class CardDisplay implements InteractionCallback {
 		this.getCanvas().removePlayer(viewer);
 	}
 
+	public void moveViewer(ServerPlayerEntity player, CardDisplay toDisplay) {
+		if (player != null) {
+			this.remove(player);
+			toDisplay.add(player);
+		}
+	}
+
 	public final void destroy() {
 		this.display.destroy();
 		this.getCanvas().destroy();
@@ -132,11 +122,41 @@ public abstract class CardDisplay implements InteractionCallback {
 		return this.canvasCache.computeIfAbsent(card, this::renderCardCanvas);
 	}
 
+	/**
+	 * {@return the spacing between cards on the X axis}
+	 * @param width the width of the last card
+	 */
+	public int getHorizontalSpacing(int width) {
+		return width + CardSpacing.GAP_X;
+	}
+
+	/**
+	 * {@return the spacing between rows of cards on the Y axis}
+	 * @param maxHeight the height of the tallest card on the last row
+	 */
+	public int getVerticalSpacing(int maxHeight) {
+		return maxHeight + CardSpacing.PADDING_Y;
+	}
+
+	public int getHorizontalMargin(int row) {
+		return CardSpacing.PADDING_X;
+	}
+
 	public boolean hasOutline(Card card) {
 		return false;
 	}
 
 	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {
 		return null;
+	}
+
+	private static BlockPos getDisplayPos(int rotation, BlockBounds bounds) {
+		BlockPos min = bounds.min();
+		BlockPos max = bounds.max();
+
+		int x = rotation == 0 || rotation == 3 ? min.getX() : max.getX();
+		int z = rotation == 0 || rotation == 1 ? min.getZ() : max.getZ();
+
+		return new BlockPos(x, min.getY(), z);
 	}
 }

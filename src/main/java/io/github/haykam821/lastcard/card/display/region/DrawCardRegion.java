@@ -1,6 +1,6 @@
 package io.github.haykam821.lastcard.card.display.region;
 
-import io.github.haykam821.lastcard.game.PlayerEntry;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 
 public class DrawCardRegion extends CardRegion {
 	public DrawCardRegion(int minX, int minY, int maxX, int maxY) {
@@ -8,7 +8,7 @@ public class DrawCardRegion extends CardRegion {
 	}
 
 	@Override
-	public void onClick(PlayerEntry player, int x, int y) {
+	public void onClick(AbstractPlayerEntry player, int x, int y) {
 		player.drawForTurn();
 	}
 

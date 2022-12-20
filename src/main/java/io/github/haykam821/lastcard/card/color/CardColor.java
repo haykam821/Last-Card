@@ -3,11 +3,16 @@ package io.github.haykam821.lastcard.card.color;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
+import io.github.haykam821.lastcard.turn.TurnManager;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.particle.DustColorTransitionParticleEffect;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 
 public enum CardColor implements ColorRepresentation {
 	RED("red", Items.RED_WOOL, Formatting.RED, BossBar.Color.RED, CardTemplates.RED_FRONT, CanvasColor.RED_NORMAL),
@@ -26,7 +31,9 @@ public enum CardColor implements ColorRepresentation {
 	private final DrawableCanvas template;
 	private final CanvasColor canvasTextColor;
 
-	private CardColor(String key, Item item, Formatting formatting, BossBar.Color bossBarColor, DrawableCanvas template, CanvasColor canvasTextColor) {
+	private final ParticleEffect particle;
+
+	private CardColor(String key, Item item, Formatting formatting, BossBar.Color bossBarColor, DrawableCanvas template, CanvasColor canvasTextColor, ParticleEffect particle) {
 		this.name = Text.translatable("text.lastcard.card.color." + key);
 		this.item = item;
 
@@ -35,6 +42,12 @@ public enum CardColor implements ColorRepresentation {
 
 		this.template = template;
 		this.canvasTextColor = canvasTextColor;
+
+		this.particle = particle;
+	}
+
+	private CardColor(String key, Item item, Formatting formatting, BossBar.Color bossBarColor, DrawableCanvas template, CanvasColor canvasTextColor) {
+		this(key, item, formatting, bossBarColor, template, canvasTextColor, createParticleEffect(canvasTextColor));
 	}
 
 	@Override
@@ -65,5 +78,18 @@ public enum CardColor implements ColorRepresentation {
 	@Override
 	public CanvasColor getCanvasTextColor() {
 		return this.canvasTextColor;
+	}
+
+	public ParticleEffect getParticle() {
+		return this.particle;
+	}
+
+	private static ParticleEffect createParticleEffect(CanvasColor canvasColor) {
+		return createParticleEffect(canvasColor.getRgbColor());
+	}
+
+	public static ParticleEffect createParticleEffect(int rgb) {
+		Vec3f color = new Vec3f(Vec3d.unpackRgb(rgb));
+		return new DustColorTransitionParticleEffect(color, TurnManager.BLACK_PARTICLE_COLOR, TurnManager.PARTICLE_SIZE);
 	}
 }

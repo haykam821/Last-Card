@@ -7,11 +7,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
@@ -29,7 +31,7 @@ import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 import xyz.nucleoid.stimuli.event.world.FluidFlowEvent;
 
-public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamageEvent, PlayerDeathEvent, GameActivityEvents.RequestStart, FluidFlowEvent, ItemPickupEvent {
+public class LastCardWaitingPhase implements GamePlayerEvents.Offer, GameActivityEvents.Tick, PlayerDamageEvent, PlayerDeathEvent, GameActivityEvents.RequestStart, FluidFlowEvent, ItemPickupEvent {
 	private final GameSpace gameSpace;
 	private final ServerWorld world;
 
@@ -47,11 +49,15 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 	public static GameOpenProcedure open(GameOpenContext<LastCardConfig> context) {
 		LastCardConfig config = context.config();
 
+		MinecraftServer server = context.server();
+		Random random = server.getOverworld().getRandom();
+
 		LastCardMapBuilder mapBuilder = new LastCardMapBuilder(config);
-		LastCardMap map = mapBuilder.create(context.server());
+		LastCardMap map = mapBuilder.create(server);
 
 		RuntimeWorldConfig worldConfig = new RuntimeWorldConfig()
-			.setGenerator(map.createGenerator(context.server()));
+			.setTimeOfDay(config.getTimeOfDay().get(random))
+			.setGenerator(map.createGenerator(server));
 
 		return context.openWithWorld(worldConfig, (activity, world) -> {
 			LastCardWaitingPhase phase = new LastCardWaitingPhase(activity.getGameSpace(), world, config, map);
@@ -62,6 +68,7 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 
 			// Listeners
 			activity.listen(GamePlayerEvents.OFFER, phase);
+			activity.listen(GameActivityEvents.TICK, phase);
 			activity.listen(PlayerDamageEvent.EVENT, phase);
 			activity.listen(PlayerDeathEvent.EVENT, phase);
 			activity.listen(GameActivityEvents.REQUEST_START, phase);
@@ -86,13 +93,22 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 	}
 
 	@Override
+	public void onTick() {
+		for (ServerPlayerEntity player : this.gameSpace.getPlayers()) {
+			if (!this.map.contains(player)) {
+				this.spawn(player);
+			}
+		}
+	}
+
+	@Override
 	public ActionResult onDamage(ServerPlayerEntity player, DamageSource source, float amount) {
 		return ActionResult.FAIL;
 	}
 
 	@Override
 	public ActionResult onDeath(ServerPlayerEntity player, DamageSource source) {
-		LastCardActivePhase.spawn(this.world, this.map, player);
+		this.spawn(player);
 		return ActionResult.FAIL;
 	}
 
@@ -100,5 +116,9 @@ public class LastCardWaitingPhase implements GamePlayerEvents.Offer, PlayerDamag
 	public GameResult onRequestStart() {
 		LastCardActivePhase.open(this.gameSpace, this.world, this.config, this.map);
 		return GameResult.ok();
+	}
+
+	private void spawn(ServerPlayerEntity player) {
+		this.map.getWaitingSpawn().teleport(player);
 	}
 }

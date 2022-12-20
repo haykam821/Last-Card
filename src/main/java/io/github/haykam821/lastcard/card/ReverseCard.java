@@ -4,7 +4,7 @@ import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
-import io.github.haykam821.lastcard.game.PlayerEntry;
+import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import io.github.haykam821.lastcard.turn.TurnDirection;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -30,7 +30,7 @@ public class ReverseCard extends SymbolCard {
 	}
 
 	@Override
-	public void play(PlayerEntry player) {
+	public void play(AbstractPlayerEntry player) {
 		super.play(player);
 
 		TurnDirection direction = player.getPhase().getTurnManager().reverseDirection();

@@ -1,0 +1,17 @@
+{
+	"type": "lastcard:last_card",
+	"icon": "minecraft:dark_oak_sapling",
+	"map": "lastcard:dark_oak_graveyard",
+	"time_of_day": 15000,
+	"chair_block": {
+		"type": "minecraft:simple_state_provider",
+		"state": {
+			"Name": "minecraft:cobblestone_stairs"
+		}
+	},
+	"players": {
+		"min": 1,
+		"max": 12,
+		"threshold": 3
+	}
+}

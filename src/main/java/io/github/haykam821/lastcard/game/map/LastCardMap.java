@@ -3,8 +3,10 @@ package io.github.haykam821.lastcard.game.map;
 import java.util.List;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import xyz.nucleoid.map_templates.MapTemplate;
 import xyz.nucleoid.map_templates.TemplateRegion;
@@ -14,12 +16,14 @@ public class LastCardMap {
 	private static final Random RANDOM = Random.createLocal();
 
 	private final MapTemplate template;
+	private final Box box;
 
 	private final List<Spawn> waitingSpawns;
 	private final TemplateRegion pileCardDisplay;
 
 	public LastCardMap(MapTemplate template) {
 		this.template = template;
+		this.box = this.template.getBounds().asBox();
 
 		this.waitingSpawns = this.template.getMetadata().getRegions(LastCardRegions.WAITING_SPAWN_MARKER)
 			.map(Spawn::new)
@@ -34,6 +38,10 @@ public class LastCardMap {
 		if (this.pileCardDisplay == null) {
 			throw new IllegalStateException("The pile card display region is missing");
 		}
+	}
+
+	public boolean contains(ServerPlayerEntity player) {
+		return this.box.contains(player.getPos());
 	}
 
 	public Spawn getWaitingSpawn() {
