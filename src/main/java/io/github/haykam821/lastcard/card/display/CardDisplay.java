@@ -9,7 +9,7 @@ import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.core.PlayerCanvas;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay;
-import eu.pb4.mapcanvas.api.utils.VirtualDisplay.InteractionCallback;
+import eu.pb4.mapcanvas.api.utils.VirtualDisplay.TypedInteractionCallback;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.display.layout.CardLayout;
 import io.github.haykam821.lastcard.card.display.layout.CardSpacing;
@@ -19,12 +19,14 @@ import io.github.haykam821.lastcard.game.map.LastCardRegions;
 import io.github.haykam821.lastcard.game.phase.PlayerEntryGetter;
 import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.ClickType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import xyz.nucleoid.map_templates.BlockBounds;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
-public abstract class CardDisplay implements InteractionCallback {
+public abstract class CardDisplay implements TypedInteractionCallback {
 	protected final PlayerEntryGetter entryGetter;
 
 	private final Map<Card, DrawableCanvas> canvasCache = new HashMap<>();
@@ -46,7 +48,14 @@ public abstract class CardDisplay implements InteractionCallback {
 		PlayerCanvas canvas = rotation % 2 == 0 ? DrawableCanvas.create(x, z) : DrawableCanvas.create(z, x);
 		BlockPos pos = CardDisplay.getDisplayPos(rotation, bounds);
 
-		this.display = VirtualDisplay.of(canvas, pos, Direction.UP, rotation, false, this);
+		this.display = VirtualDisplay.builder()
+			.canvas(canvas)
+			.pos(pos)
+			.direction(Direction.UP)
+			.rotation(BlockRotation.values()[rotation])
+			.callback(this)
+			.invisible()
+			.build();
 	}
 
 	public void update() {
@@ -75,7 +84,7 @@ public abstract class CardDisplay implements InteractionCallback {
 	}
 
 	@Override
-	public void onClick(ServerPlayerEntity player, int x, int y) {
+	public void onClick(ServerPlayerEntity player, ClickType type, int x, int y) {
 		AbstractPlayerEntry entry = this.entryGetter.getPlayerEntry(player);
 
 		if (entry != null) {

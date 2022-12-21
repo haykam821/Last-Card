@@ -55,7 +55,7 @@ public class Chair extends Spawn {
 
 		if (player.getWorld().isAir(this.blockPos)) {
 			Direction facing = Direction.fromRotation(this.rotation).getOpposite();
-			BlockState state = this.chairBlock.getBlockState(world.getRandom(), this.blockPos).with(StairsBlock.FACING, facing);
+			BlockState state = this.chairBlock.get(world.getRandom(), this.blockPos).with(StairsBlock.FACING, facing);
 
 			world.setBlockState(this.blockPos, state);
 		}

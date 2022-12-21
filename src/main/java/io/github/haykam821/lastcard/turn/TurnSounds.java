@@ -6,7 +6,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 public class TurnSounds {
-	private static final SoundEvent TURN_SOUND = SoundEvents.BLOCK_NOTE_BLOCK_CHIME;
+	private static final SoundEvent TURN_SOUND = SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value();
 	private static final SoundCategory TURN_SOUND_CATEGORY = SoundCategory.PLAYERS;
 
 	private static final float TURN_SOUND_VOLUME = 0.3f;

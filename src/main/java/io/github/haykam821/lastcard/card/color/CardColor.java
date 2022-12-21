@@ -1,5 +1,7 @@
 package io.github.haykam821.lastcard.card.color;
 
+import org.joml.Vector3f;
+
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
@@ -12,7 +14,6 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 
 public enum CardColor implements ColorRepresentation {
 	RED("red", Items.RED_WOOL, Formatting.RED, BossBar.Color.RED, CardTemplates.RED_FRONT, CanvasColor.RED_NORMAL),
@@ -89,7 +90,7 @@ public enum CardColor implements ColorRepresentation {
 	}
 
 	public static ParticleEffect createParticleEffect(int rgb) {
-		Vec3f color = new Vec3f(Vec3d.unpackRgb(rgb));
+		Vector3f color = Vec3d.unpackRgb(rgb).toVector3f();
 		return new DustColorTransitionParticleEffect(color, TurnManager.BLACK_PARTICLE_COLOR, TurnManager.PARTICLE_SIZE);
 	}
 }
