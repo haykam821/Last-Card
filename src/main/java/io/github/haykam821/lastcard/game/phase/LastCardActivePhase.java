@@ -3,7 +3,6 @@ package io.github.haykam821.lastcard.game.phase;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import com.google.common.collect.Lists;
 
@@ -28,7 +27,6 @@ import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -36,6 +34,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.map_templates.TemplateRegion;
 import xyz.nucleoid.plasmid.game.GameActivity;
@@ -301,7 +300,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 	private Text getEndingMessage() {
 		if (this.players.isEmpty()) {
-			return new TranslatableText("text.lastcard.no_winners").formatted(Formatting.GOLD);
+			return Text.translatable("text.lastcard.no_winners").formatted(Formatting.GOLD);
 		}
 
 		AbstractPlayerEntry winner = this.players.iterator().next();

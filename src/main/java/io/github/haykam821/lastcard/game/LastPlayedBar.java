@@ -5,7 +5,6 @@ import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import xyz.nucleoid.plasmid.game.common.GlobalWidgets;
 import xyz.nucleoid.plasmid.game.common.widget.BossBarWidget;
@@ -29,10 +28,10 @@ public class LastPlayedBar {
 	private Text getTitle() {
 		Card previousCard = this.phase.getDeck().getPreviousCard();
 		if (previousCard == null) {
-			return new TranslatableText("text.lastcard.last_played.none");
+			return Text.translatable("text.lastcard.last_played.none");
 		}
 
-		return new TranslatableText("text.lastcard.last_played", previousCard.getFullName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.last_played", previousCard.getFullName()).formatted(Formatting.GOLD);
 	}
 
 	private BossBar.Color getColor() {

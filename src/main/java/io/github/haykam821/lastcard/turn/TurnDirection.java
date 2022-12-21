@@ -1,7 +1,6 @@
 package io.github.haykam821.lastcard.turn;
 
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public enum TurnDirection {
 	CLOCKWISE("clockwise", 1),
@@ -11,7 +10,7 @@ public enum TurnDirection {
 	private final int multiplier;
 
 	private TurnDirection(String key, int multiplier) {
-		this.name = new TranslatableText("text.lastcard.turn.direction." + key);
+		this.name = Text.translatable("text.lastcard.turn.direction." + key);
 		this.multiplier = multiplier;
 	}
 

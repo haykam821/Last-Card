@@ -8,7 +8,6 @@ import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.card.display.layout.CardSpacing;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public class NumberCard extends Card {
 	private static final CanvasFont FONT = DefaultFonts.VANILLA;
@@ -23,7 +22,7 @@ public class NumberCard extends Card {
 
 	@Override
 	public Text getName() {
-		return new TranslatableText("text.lastcard.card.number", this.value);
+		return Text.translatable("text.lastcard.card.number", this.value);
 	}
 
 	@Override

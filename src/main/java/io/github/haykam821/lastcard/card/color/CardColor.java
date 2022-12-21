@@ -10,7 +10,6 @@ import net.minecraft.item.Items;
 import net.minecraft.particle.DustColorTransitionParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -35,7 +34,7 @@ public enum CardColor implements ColorRepresentation {
 	private final ParticleEffect particle;
 
 	private CardColor(String key, Item item, Formatting formatting, BossBar.Color bossBarColor, DrawableCanvas template, CanvasColor canvasTextColor, ParticleEffect particle) {
-		this.name = new TranslatableText("text.lastcard.card.color." + key);
+		this.name = Text.translatable("text.lastcard.card.color." + key);
 		this.item = item;
 
 		this.formatting = formatting;

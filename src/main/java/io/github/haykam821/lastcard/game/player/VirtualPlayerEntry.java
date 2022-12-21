@@ -8,14 +8,13 @@ import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
 public class VirtualPlayerEntry extends AbstractPlayerEntry {
 	private final String key = RandomStringUtils.randomAlphabetic(6);
-	private final Text name = new LiteralText(this.key).formatted(Formatting.GRAY);
+	private final Text name = Text.literal(this.key).formatted(Formatting.GRAY);
 
 	public VirtualPlayerEntry(LastCardActivePhase phase, TemplateRegion chair, TemplateRegion publicDisplay) {
 		super(phase, chair, publicDisplay);

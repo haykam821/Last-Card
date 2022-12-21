@@ -1,7 +1,5 @@
 package io.github.haykam821.lastcard.game.phase;
 
-import java.util.Random;
-
 import io.github.haykam821.lastcard.game.LastCardConfig;
 import io.github.haykam821.lastcard.game.map.LastCardMap;
 import io.github.haykam821.lastcard.game.map.LastCardMapBuilder;
@@ -15,6 +13,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.plasmid.game.GameOpenContext;

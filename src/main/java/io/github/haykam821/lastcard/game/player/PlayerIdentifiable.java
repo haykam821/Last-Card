@@ -5,7 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public abstract class PlayerIdentifiable {
@@ -28,32 +27,32 @@ public abstract class PlayerIdentifiable {
 
 	// Messages
 	public final Text getWinMessage() {
-		return new TranslatableText("text.lastcard.win", this.getName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.win", this.getName()).formatted(Formatting.GOLD);
 	}
 
 	public final Text getNextTurnMessage() {
-		return new TranslatableText("text.lastcard.turn.next", this.getName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.turn.next", this.getName()).formatted(Formatting.GOLD);
 	}
 
 	protected final Text getTurnName() {
-		Text name = this.getName().shallowCopy().formatted(Formatting.BOLD);
-		return this.hasTurn() ? new TranslatableText("text.lastcard.status.player_turn", name).formatted(Formatting.AQUA) : name;
+		Text name = this.getName().copy().formatted(Formatting.BOLD);
+		return this.hasTurn() ? Text.translatable("text.lastcard.status.player_turn", name).formatted(Formatting.AQUA) : name;
 	}
 
 	protected final Text getCardStatus() {
 		int cards = this.getCardCount();
 		String key = "text.lastcard.status.cards" + (cards == 1 ? ".single" : "");
 
-		return new TranslatableText(key, cards);
+		return Text.translatable(key, cards);
 	}
 
 	public final Text getCardDrewMessage(int count) {
 		MutableText text;
 
 		if (count == 1) {
-			text = new TranslatableText("text.lastcard.card_drew", this.getName());
+			text = Text.translatable("text.lastcard.card_drew", this.getName());
 		} else if (count > 1) {
-			text = new TranslatableText("text.lastcard.card_drew.many", this.getName(), count);
+			text = Text.translatable("text.lastcard.card_drew.many", this.getName(), count);
 		} else {
 			throw new IllegalStateException("Cannot get negative card drew message");
 		}
@@ -62,10 +61,10 @@ public abstract class PlayerIdentifiable {
 	}
 
 	protected final Text getCardDrewYouMessage(Card card) {
-		return new TranslatableText("text.lastcard.card_drew.you", card.getFullName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.card_drew.you", card.getFullName()).formatted(Formatting.GOLD);
 	}
 
 	public final Text getCardDrewManyYouMessage(int count) {
-		return new TranslatableText("text.lastcard.card_drew.many.you", count).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.card_drew.many.you", count).formatted(Formatting.GOLD);
 	}
 }
