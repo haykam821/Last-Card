@@ -7,7 +7,6 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class WildColorSelector implements ColorSelector {
@@ -37,7 +36,7 @@ public class WildColorSelector implements ColorSelector {
 
 	@Override
 	public Text getName() {
-		return new TranslatableText("text.lastcard.card.color.selector.wild");
+		return Text.translatable("text.lastcard.card.color.selector.wild");
 	}
 
 	@Override

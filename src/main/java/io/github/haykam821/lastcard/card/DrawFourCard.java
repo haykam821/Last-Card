@@ -4,7 +4,6 @@ import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public class DrawFourCard extends DrawCard {
 	public DrawFourCard() {
@@ -13,7 +12,7 @@ public class DrawFourCard extends DrawCard {
 
 	@Override
 	public Text getName() {
-		return new TranslatableText("text.lastcard.card.draw_four");
+		return Text.translatable("text.lastcard.card.draw_four");
 	}
 
 	@Override

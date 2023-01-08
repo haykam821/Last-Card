@@ -11,9 +11,7 @@ import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipSection;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 
@@ -41,7 +39,7 @@ public abstract class Card {
 	public abstract Text getName();
 
 	public final Text getFullName() {
-		return new LiteralText("")
+		return Text.empty()
 			.append(this.selector.getName())
 			.append(" ")
 			.append(this.getName())
@@ -83,10 +81,10 @@ public abstract class Card {
 	public abstract void renderOverlay(DrawableCanvas canvas, CanvasColor textColor);
 
 	private Text getCardPlayedMessage(AbstractPlayerEntry player) {
-		return new TranslatableText("text.lastcard.card_played", player.getName(), this.getFullName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.card_played", player.getName(), this.getFullName()).formatted(Formatting.GOLD);
 	}
 
 	private Text getCardPlayedYouMessage() {
-		return new TranslatableText("text.lastcard.card_played.you", this.getFullName()).formatted(Formatting.GOLD);
+		return Text.translatable("text.lastcard.card_played.you", this.getFullName()).formatted(Formatting.GOLD);
 	}
 }
