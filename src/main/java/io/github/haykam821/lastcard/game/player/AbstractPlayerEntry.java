@@ -69,6 +69,9 @@ public abstract class AbstractPlayerEntry extends PlayerIdentifiable {
 			card.play(this);
 
 			if (this.cards.isEmpty()) {
+				this.updateDisplays();
+				this.phase.updatePileDisplay();
+
 				this.phase.endWithWinner(this);
 			} else {
 				this.phase.getTurnManager().cycleTurn();

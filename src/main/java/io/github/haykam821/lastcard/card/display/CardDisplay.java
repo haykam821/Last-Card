@@ -88,6 +88,10 @@ public abstract class CardDisplay implements TypedInteractionCallback {
 		AbstractPlayerEntry entry = this.entryGetter.getPlayerEntry(player);
 
 		if (entry != null) {
+			if (entry.getPhase().isGameEnding()) {
+				return;
+			}
+
 			for (CardRegion region : this.regions) {
 				if (region.contains(x, y)) {
 					region.onClick(entry, x, y);

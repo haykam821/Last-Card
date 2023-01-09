@@ -75,7 +75,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	private final CardDisplay privatePileDisplay;
 	private final CardDisplay publicPileDisplay;
 	private boolean singleplayer;
-	private boolean opened;
+	private int ticksUntilClose = -1;
 
 	public LastCardActivePhase(GameSpace gameSpace, ServerWorld world, LastCardConfig config, LastCardMap map, TeamManager teams, GlobalWidgets widgets) {
 		this.gameSpace = gameSpace;
@@ -133,8 +133,6 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 	@Override
 	public void onEnable() {
-		this.opened = true;
-
 		// Randomly assign chairs to players
 		List<ServerPlayerEntity> players = Lists.newArrayList(gameSpace.getPlayers());
 		Collections.shuffle(players);
@@ -193,6 +191,16 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	public void onTick() {
 		this.turnManager.tick();
 
+		// Decrease ticks until game end to zero
+		if (this.isGameEnding()) {
+			if (this.ticksUntilClose == 0) {
+				this.gameSpace.close(GameCloseReason.FINISHED);
+			}
+
+			this.ticksUntilClose -= 1;
+			return;
+		}
+
 		for (ServerPlayerEntity player : this.gameSpace.getPlayers()) {
 			if (!this.map.contains(player)) {
 				this.spawn(player);
@@ -229,7 +237,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 
 	@Override
 	public void onRemovePlayer(ServerPlayerEntity player) {
-		if (!this.opened) return;
+		if (this.isGameEnding()) return;
 
 		AbstractPlayerEntry entry = this.getPlayerEntry(player);
 		if (entry == null) return;
@@ -313,8 +321,11 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	
 	private void endWithMessage(Text message) {
 		this.sendMessage(message);
-		this.gameSpace.close(GameCloseReason.FINISHED);
-		this.opened = false;
+		this.ticksUntilClose = this.config.getTicksUntilClose().get(this.world.getRandom());
+	}
+
+	public boolean isGameEnding() {
+		return this.ticksUntilClose >= 0;
 	}
 
 	@Override

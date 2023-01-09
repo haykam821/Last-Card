@@ -103,13 +103,15 @@ public class TurnManager {
 		}
 	}
 
-	public void tick() {
+	private void tickVirtualAction() {
 		this.turnTicks += 1;
 
 		if (this.turnTicks == VIRTUAL_ACTION_TURN_TICKS && this.turn != null) {
 			this.turn.performVirtualAction();
 		}
+	}
 
+	private void tickParticles() {
 		this.ticks += this.direction.multiply(-1);
 
 		if (this.ticks % PARTICLE_UPDATE_RATE == 0) {
@@ -128,5 +130,13 @@ public class TurnManager {
 			world.spawnParticles(particle, x + deltaX, y, z + deltaZ, 1, 0, 0, 0, 0);
 			world.spawnParticles(particle, x - deltaX, y, z - deltaZ, 1, 0, 0, 0, 0);
 		}
+	}
+
+	public void tick() {
+		if (!this.phase.isGameEnding()) {
+			this.tickVirtualAction();
+		}
+
+		this.tickParticles();
 	}
 }
