@@ -1,8 +1,10 @@
 package io.github.haykam821.lastcard.game.phase;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
 
 import com.google.common.collect.Lists;
 
@@ -74,6 +76,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	private final TurnManager turnManager;
 	private final CardDisplay privatePileDisplay;
 	private final CardDisplay publicPileDisplay;
+	private final Queue<ServerPlayerEntity> displayAddQueue = new ArrayDeque<>();
 	private boolean singleplayer;
 	private int ticksUntilClose = -1;
 
@@ -207,6 +210,15 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 			}
 		}
 
+		while (!this.displayAddQueue.isEmpty()) {
+			ServerPlayerEntity viewer = this.displayAddQueue.poll();
+			this.publicPileDisplay.add(viewer);
+
+			for (AbstractPlayerEntry player : this.players) {
+				player.addDisplay(viewer);
+			}
+		}
+
 		// End early if there are not enough players to continue
 		if (this.shouldEndEarly()) {
 			this.endWithMessage(this.getEndingMessage());
@@ -216,11 +228,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 	@Override
 	public PlayerOfferResult onOfferPlayer(PlayerOffer offer) {
 		return this.map.getWaitingSpawn().acceptOffer(offer, this.world, GameMode.SPECTATOR).and(() -> {
-			this.publicPileDisplay.add(offer.player());
-
-			for (AbstractPlayerEntry player : this.players) {
-				player.addDisplay(offer.player());
-			}
+			this.displayAddQueue.add(offer.player());
 		});
 	}
 
