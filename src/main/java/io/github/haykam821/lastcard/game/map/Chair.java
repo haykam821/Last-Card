@@ -2,10 +2,6 @@ package io.github.haykam821.lastcard.game.map;
 
 import java.util.Comparator;
 
-import eu.pb4.holograms.api.Holograms;
-import eu.pb4.holograms.api.elements.HologramElement;
-import eu.pb4.holograms.api.holograms.AbstractHologram;
-import eu.pb4.holograms.api.holograms.AbstractHologram.VerticalAlign;
 import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import io.github.haykam821.lastcard.mixin.ArmorStandEntityAccessor;
 import net.minecraft.block.BlockState;
@@ -16,6 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.gen.stateprovider.BlockStateProvider;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
@@ -36,7 +33,7 @@ public class Chair extends Spawn {
 	public Chair(TemplateRegion region, BlockStateProvider chairBlock) {
 		super(region);
 
-		this.blockPos = new BlockPos(this.pos);
+		this.blockPos = BlockPos.ofFloored(this.pos);
 		this.turnOrder = LastCardRegions.getTurnOrder(region);
 
 		this.chairBlock = chairBlock;
@@ -75,12 +72,7 @@ public class Chair extends Spawn {
 		return mount;
 	}
 
-	public AbstractHologram createStatusHologram(ServerWorld world) {
-		AbstractHologram hologram = Holograms.create(world, this.pos.add(0, MOUNT_Y_OFFSET + 1.8, 0), new HologramElement[0]);
-
-		hologram.setAlignment(VerticalAlign.TOP);
-		hologram.show();
-
-		return hologram;
+	public Vec3d getStatusHologramPos() {
+		return this.pos.add(0, MOUNT_Y_OFFSET + 1.8, 0);
 	}
 }

@@ -11,6 +11,7 @@ import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipSection;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
@@ -41,7 +42,7 @@ public abstract class Card {
 	public final Text getFullName() {
 		return Text.empty()
 			.append(this.selector.getName())
-			.append(" ")
+			.append(ScreenTexts.SPACE)
 			.append(this.getName())
 			.formatted(this.selector.getFormatting());
 	}
