@@ -48,10 +48,7 @@ public abstract class CardDisplay implements TypedInteractionCallback {
 		PlayerCanvas canvas = rotation % 2 == 0 ? DrawableCanvas.create(x, z) : DrawableCanvas.create(z, x);
 		BlockPos pos = CardDisplay.getDisplayPos(rotation, bounds);
 
-		this.display = VirtualDisplay.builder()
-			.canvas(canvas)
-			.pos(pos)
-			.direction(Direction.UP)
+		this.display = VirtualDisplay.builder(canvas, pos, Direction.UP)
 			.rotation(BlockRotation.values()[rotation])
 			.callback(this)
 			.invisible()

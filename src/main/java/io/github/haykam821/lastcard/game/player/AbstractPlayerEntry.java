@@ -3,12 +3,12 @@ package io.github.haykam821.lastcard.game.player;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.pb4.holograms.api.holograms.AbstractHologram;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.card.display.player.PublicCardDisplay;
 import io.github.haykam821.lastcard.game.map.Chair;
+import io.github.haykam821.lastcard.game.map.StatusHologram;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import net.minecraft.server.network.ServerPlayerEntity;
 import xyz.nucleoid.map_templates.TemplateRegion;
@@ -18,7 +18,7 @@ public abstract class AbstractPlayerEntry extends PlayerIdentifiable {
 	private final List<Card> cards;
 
 	private final Chair chair;
-	private final AbstractHologram statusHologram;
+	private final StatusHologram statusHologram;
 	private final CardDisplay publicDisplay;
 
 	private boolean dirtyDisplays = false;
@@ -34,12 +34,16 @@ public abstract class AbstractPlayerEntry extends PlayerIdentifiable {
 		}
 
 		this.chair = new Chair(chair, phase.getConfig().getChairBlock());
-		this.statusHologram = this.chair.createStatusHologram(this.phase.getWorld());
+		this.statusHologram = new StatusHologram(this);
 
 		this.publicDisplay = new PublicCardDisplay(this, publicDisplay);
 	}
 
 	public abstract void spawn();
+
+	public void tick() {
+		this.statusHologram.tick();
+	}
 
 	@Override
 	public final boolean hasTurn() {
@@ -131,20 +135,18 @@ public abstract class AbstractPlayerEntry extends PlayerIdentifiable {
 		this.getDisplayViewableBy(viewer).remove(viewer);
 	}
 
+	public void attachDisplays() {
+		this.statusHologram.attach(this.phase.getWorld(), this.chair.getStatusHologramPos());
+		this.updateDisplays();
+	}
+
 	public void destroyDisplays() {
-		this.statusHologram.hide();
+		this.statusHologram.destroy();
 		this.publicDisplay.destroy();
 	}
 
-	private void updateStatus() {
-		this.statusHologram.setItemStack(0, this.createHeadStack(), true);
-
-		this.statusHologram.setText(1, this.getTurnName(), false);
-		this.statusHologram.setText(2, this.getCardStatus(), false);
-	}
-
 	public void updateDisplays() {
-		this.updateStatus();
+		this.statusHologram.update();
 		this.publicDisplay.update();
 	}
 

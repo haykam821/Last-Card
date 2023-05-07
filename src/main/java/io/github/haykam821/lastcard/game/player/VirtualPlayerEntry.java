@@ -36,7 +36,7 @@ public class VirtualPlayerEntry extends AbstractPlayerEntry {
 	}
 
 	@Override
-	protected ItemStack createHeadStack() {
+	public ItemStack createHeadStack() {
 		return new ItemStack(Items.COMMAND_BLOCK);
 	}
 

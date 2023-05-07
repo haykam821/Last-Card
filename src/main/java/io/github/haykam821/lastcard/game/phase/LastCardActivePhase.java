@@ -183,7 +183,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 				player.addDisplay(viewer);
 			}
 
-			player.updateDisplays();
+			player.attachDisplays();
 		}
 
 		this.turnManager.sendNextTurnEffects();
@@ -208,6 +208,10 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 			if (!this.map.contains(player)) {
 				this.spawn(player);
 			}
+		}
+
+		for (AbstractPlayerEntry player : this.players) {
+			player.tick();
 		}
 
 		while (!this.displayAddQueue.isEmpty()) {

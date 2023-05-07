@@ -2,6 +2,7 @@ package io.github.haykam821.lastcard.game.player;
 
 import io.github.haykam821.lastcard.card.Card;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -11,7 +12,14 @@ public abstract class PlayerIdentifiable {
 	// Display
 	public abstract Text getName();
 
-	protected abstract ItemStack createHeadStack();
+	public abstract ItemStack createHeadStack();
+
+	public final Text getHologramText() {
+		return Text.empty()
+			.append(this.getTurnName())
+			.append(ScreenTexts.LINE_BREAK)
+			.append(this.getCardStatus());
+	}
 
 	// Card information
 	public abstract boolean hasTurn();

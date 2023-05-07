@@ -49,7 +49,7 @@ public class PlayerEntry extends AbstractPlayerEntry {
 	}
 
 	@Override
-	protected ItemStack createHeadStack() {
+	public ItemStack createHeadStack() {
 		ItemStack stack = new ItemStack(Items.PLAYER_HEAD);
 
 		NbtCompound nbt = new NbtCompound();
