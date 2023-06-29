@@ -45,12 +45,12 @@ public class Chair extends Spawn {
 
 	@Override
 	public void teleport(ServerPlayerEntity player) {
-		ServerWorld world = player.getWorld();
+		ServerWorld world = player.getServerWorld();
 		if (this.mount == null) {
 			this.mount = this.createMount(world);
 		}
 
-		if (player.getWorld().isAir(this.blockPos)) {
+		if (world.isAir(this.blockPos)) {
 			Direction facing = Direction.fromRotation(this.rotation).getOpposite();
 			BlockState state = this.chairBlock.get(world.getRandom(), this.blockPos).with(StairsBlock.FACING, facing);
 

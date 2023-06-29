@@ -18,7 +18,7 @@ public class Spawn {
 	}
 
 	public void teleport(ServerPlayerEntity player) {
-		player.teleport(player.getWorld(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), this.rotation, 0);
+		player.teleport(player.getServerWorld(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), this.rotation, 0);
 	}
 
 	public Accept acceptOffer(PlayerOffer offer, ServerWorld world, GameMode gameMode) {
