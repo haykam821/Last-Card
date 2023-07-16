@@ -9,6 +9,8 @@ import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.DisplayEntity.BillboardMode;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 
 public final class StatusHologram {
@@ -62,6 +64,7 @@ public final class StatusHologram {
 
 		applyElementAttributes(element);
 		element.setModelTransformation(ModelTransformationMode.GROUND);
+		element.setLeftRotation(RotationAxis.POSITIVE_Y.rotation(MathHelper.PI));
 
 		return element;
 	}
