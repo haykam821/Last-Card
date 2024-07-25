@@ -1,5 +1,7 @@
 package io.github.haykam821.lastcard.game.map;
 
+import org.joml.Vector3f;
+
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
@@ -25,7 +27,7 @@ public final class StatusHologram {
 	public StatusHologram(AbstractPlayerEntry player) {
 		this.player = player;
 
-		this.headStackElement = createItemElement();
+		this.headStackElement = createHeadStackElement();
 		this.headStackHolder = createHolder(this.headStackElement);
 
 		this.textElement = createTextElement();
@@ -43,8 +45,10 @@ public final class StatusHologram {
 	}
 
 	public void attach(ServerWorld world, Vec3d pos) {
-		ChunkAttachment.of(this.headStackHolder, world, pos.add(0, 0.56, 0));
-		ChunkAttachment.of(this.textHolder, world, pos.subtract(0, 0.12, 0));
+		Vec3d attachmentPos = pos.subtract(0, 0.12, 0);
+
+		ChunkAttachment.of(this.headStackHolder, world, attachmentPos);
+		ChunkAttachment.of(this.textHolder, world, attachmentPos);
 	}
 
 	public void destroy() {
@@ -57,6 +61,15 @@ public final class StatusHologram {
 		holder.addElement(element);
 
 		return holder;
+	}
+
+	public static ItemDisplayElement createHeadStackElement() {
+		ItemDisplayElement element = createItemElement();
+
+		element.setScale(new Vector3f(1, 1, 0.01f));
+		element.setTranslation(new Vector3f(0, 0.68f, 0));
+
+		return element;
 	}
 
 	public static ItemDisplayElement createItemElement() {
