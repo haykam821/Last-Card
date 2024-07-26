@@ -53,7 +53,7 @@ public class PlayerEntry extends AbstractPlayerEntry {
 		ItemStack stack = new ItemStack(Items.PLAYER_HEAD);
 
 		NbtCompound nbt = new NbtCompound();
-		nbt.putString(SkullBlockEntity.SKULL_OWNER_KEY, this.player.getEntityName());
+		nbt.putString(SkullBlockEntity.SKULL_OWNER_KEY, this.player.getNameForScoreboard());
 
 		stack.setNbt(nbt);
 		return stack;

@@ -21,7 +21,7 @@ public class Chair extends Spawn {
 		return player.getChair().turnOrder;
 	});
 
-	private static final double MOUNT_Y_OFFSET = 0.25;
+	private static final double MOUNT_Y_OFFSET = 0.5;
 
 	private final BlockPos blockPos;
 	private final int turnOrder;
