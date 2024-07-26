@@ -6,6 +6,7 @@ import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.utils.ViewUtils;
 import io.github.haykam821.lastcard.card.color.CardColor;
+import io.github.haykam821.lastcard.card.color.ColorRepresentation;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
 import net.minecraft.enchantment.Enchantments;
@@ -69,9 +70,9 @@ public abstract class Card {
 		return this.selector;
 	}
 
-	public final DrawableCanvas render() {
-		DrawableCanvas canvas = this.selector.getTemplate().copy();
-		CanvasColor textColor = this.selector.getCanvasTextColor();
+	public final DrawableCanvas render(ColorRepresentation overrideColor) {
+		DrawableCanvas canvas = overrideColor.getTemplate().copy();
+		CanvasColor textColor = overrideColor.getCanvasTextColor();
 
 		this.renderOverlay(canvas, textColor);
 		this.renderOverlay(ViewUtils.flipY(ViewUtils.flipX(canvas)), textColor);

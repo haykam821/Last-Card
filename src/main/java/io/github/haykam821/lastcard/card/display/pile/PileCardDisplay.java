@@ -7,6 +7,7 @@ import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.CardDeck;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
+import io.github.haykam821.lastcard.card.display.CardRenderData;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
 import io.github.haykam821.lastcard.game.phase.PlayerEntryGetter;
 import xyz.nucleoid.map_templates.TemplateRegion;
@@ -37,11 +38,11 @@ public class PileCardDisplay extends CardDisplay {
 	}
 
 	@Override
-	public DrawableCanvas renderCardCanvas(Card card) {
-		if (card == null) {
+	public DrawableCanvas renderCardCanvas(CardRenderData data) {
+		if (data.card() == null) {
 			return CardTemplates.BACK;
 		}
 
-		return card.render();
+		return data.renderCard();
 	}
 }

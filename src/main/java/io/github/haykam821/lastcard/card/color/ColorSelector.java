@@ -10,6 +10,11 @@ public interface ColorSelector extends ColorRepresentation {
 	 */
 	public CardColor select(double x, double y);
 
+	/**
+	 * {@return the colors that can be selected when playing this card, or {@code null} if {@link #select default selection behavior} should be used
+	 */
+	public Iterable<CardColor> getSelectableColors();
+
 	public boolean isMatching(CardColor color);
 
 	public static ColorSelector of(CardColor color) {

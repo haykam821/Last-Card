@@ -35,6 +35,11 @@ public class SimpleColorSelector implements ColorSelector {
 	}
 
 	@Override
+	public Iterable<CardColor> getSelectableColors() {
+		return null;
+	}
+
+	@Override
 	public boolean isMatching(CardColor color) {
 		return this.color == color;
 	}

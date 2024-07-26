@@ -11,6 +11,7 @@ import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay;
 import eu.pb4.mapcanvas.api.utils.VirtualDisplay.TypedInteractionCallback;
 import io.github.haykam821.lastcard.card.Card;
+import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.display.layout.CardLayout;
 import io.github.haykam821.lastcard.card.display.layout.CardSpacing;
 import io.github.haykam821.lastcard.card.display.layout.LayoutEntry;
@@ -29,7 +30,7 @@ import xyz.nucleoid.map_templates.TemplateRegion;
 public abstract class CardDisplay implements TypedInteractionCallback {
 	protected final PlayerEntryGetter entryGetter;
 
-	private final Map<Card, DrawableCanvas> canvasCache = new HashMap<>();
+	private final Map<CardRenderData, DrawableCanvas> canvasCache = new HashMap<>();
 	private final VirtualDisplay display;
 
 	private final Set<CardRegion> regions = new HashSet<>();
@@ -69,9 +70,11 @@ public abstract class CardDisplay implements TypedInteractionCallback {
 
 		for (LayoutEntry entry : layout.getEntries()) {
 			Card card = entry.card();
-			entry.render(canvas, this.getCardCanvas(card), this.hasOutline(card), startX, startY);
+			CardColor overrideColor = entry.overrideColor();
 
-			CardRegion region = this.getCardRegion(card, startX + entry.x(), startY + entry.y(), startX + entry.maxX(), startY + entry.maxY());
+			entry.render(canvas, this.getCardCanvas(card, overrideColor), this.hasOutline(card), startX, startY);
+
+			CardRegion region = this.getCardRegion(card, overrideColor, startX + entry.x(), startY + entry.y(), startX + entry.maxX(), startY + entry.maxY());
 			if (region != null) {
 				this.regions.add(region);
 			}
@@ -126,10 +129,15 @@ public abstract class CardDisplay implements TypedInteractionCallback {
 
 	public abstract Iterable<Card> getCards();
 
-	public abstract DrawableCanvas renderCardCanvas(Card card);
+	public boolean shouldFlattenSelectors() {
+		return false;
+	}
 
-	public final DrawableCanvas getCardCanvas(Card card) {
-		return this.canvasCache.computeIfAbsent(card, this::renderCardCanvas);
+	public abstract DrawableCanvas renderCardCanvas(CardRenderData data);
+
+	public final DrawableCanvas getCardCanvas(Card card, CardColor overrideColor) {
+		CardRenderData data = new CardRenderData(card, overrideColor);
+		return this.canvasCache.computeIfAbsent(data, this::renderCardCanvas);
 	}
 
 	/**
@@ -156,7 +164,7 @@ public abstract class CardDisplay implements TypedInteractionCallback {
 		return false;
 	}
 
-	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {
+	public CardRegion getCardRegion(Card card, CardColor color, int minX, int minY, int maxX, int maxY) {
 		return null;
 	}
 

@@ -2,6 +2,7 @@ package io.github.haykam821.lastcard.card.display.pile;
 
 import io.github.haykam821.lastcard.card.Card;
 import io.github.haykam821.lastcard.card.CardDeck;
+import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.display.region.CardRegion;
 import io.github.haykam821.lastcard.card.display.region.DrawCardRegion;
 import io.github.haykam821.lastcard.game.phase.PlayerEntryGetter;
@@ -18,7 +19,7 @@ public class PrivatePileCardDisplay extends PileCardDisplay {
 	}
 
 	@Override
-	public CardRegion getCardRegion(Card card, int minX, int minY, int maxX, int maxY) {
+	public CardRegion getCardRegion(Card card, CardColor overrideColor, int minX, int minY, int maxX, int maxY) {
 		if (card == null) {
 			return new DrawCardRegion(minX, minY, maxX, maxY);
 		}

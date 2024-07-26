@@ -1,5 +1,7 @@
 package io.github.haykam821.lastcard.card.color;
 
+import java.util.List;
+
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import io.github.haykam821.lastcard.card.display.CardTemplates;
@@ -11,6 +13,7 @@ import net.minecraft.util.Formatting;
 
 public class WildColorSelector implements ColorSelector {
 	protected static final ColorSelector INSTANCE = new WildColorSelector();
+	protected static final Iterable<CardColor> SELECTABLE_COLORS = List.of(CardColor.values());
 
 	@Override
 	public CardColor select(double x, double y) {
@@ -27,6 +30,11 @@ public class WildColorSelector implements ColorSelector {
 				return CardColor.RED;
 			}
 		}
+	}
+
+	@Override
+	public Iterable<CardColor> getSelectableColors() {
+		return SELECTABLE_COLORS;
 	}
 
 	@Override
