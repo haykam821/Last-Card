@@ -3,11 +3,12 @@ package io.github.haykam821.lastcard.game.map;
 import java.util.Comparator;
 
 import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
-import io.github.haykam821.lastcard.mixin.ArmorStandEntityAccessor;
+import io.github.haykam821.lastcard.mixin.InteractionEntityAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.decoration.InteractionEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -62,11 +63,18 @@ public class Chair extends Spawn {
 	}
 
 	private Entity createMount(ServerWorld world) {
-		ArmorStandEntity mount = new ArmorStandEntity(world, this.pos.getX(), this.pos.getY() + MOUNT_Y_OFFSET, this.pos.getZ());
+		InteractionEntity mount = EntityType.INTERACTION.create(world);
+		InteractionEntityAccessor accessor = (InteractionEntityAccessor) mount;
+
+		accessor.lastcard$setInteractionWidth(0);
+		accessor.lastcard$setInteractionHeight(0);
+
+		mount.setPosition(this.pos.getX(), this.pos.getY() + MOUNT_Y_OFFSET, this.pos.getZ());
 		mount.setYaw(this.rotation);
 
 		mount.setInvisible(true);
-		((ArmorStandEntityAccessor) mount).lastcard$setMarker(true);
+		mount.setNoGravity(true);
+		mount.setSilent(true);
 
 		world.spawnEntity(mount);
 		return mount;
