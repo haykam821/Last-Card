@@ -3,6 +3,7 @@ package io.github.haykam821.lastcard.game;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import io.github.haykam821.lastcard.game.player.VirtualPlayerConfig;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Identifier;
@@ -16,7 +17,7 @@ public class LastCardConfig {
 		return instance.group(
 			Identifier.CODEC.fieldOf("map").forGetter(LastCardConfig::getMap),
 			PlayerConfig.CODEC.fieldOf("players").forGetter(LastCardConfig::getPlayerConfig),
-			IntProvider.NON_NEGATIVE_CODEC.optionalFieldOf("virtual_players", ConstantIntProvider.create(0)).forGetter(LastCardConfig::getVirtualPlayers),
+			VirtualPlayerConfig.CODEC.optionalFieldOf("virtual_players", VirtualPlayerConfig.DEFAULT).forGetter(LastCardConfig::getVirtualPlayers),
 			IntProvider.NON_NEGATIVE_CODEC.optionalFieldOf("ticks_until_close", ConstantIntProvider.create(SharedConstants.TICKS_PER_SECOND * 5)).forGetter(LastCardConfig::getTicksUntilClose),
 			IntProvider.POSITIVE_CODEC.optionalFieldOf("initial_hand_count", ConstantIntProvider.create(7)).forGetter(LastCardConfig::getInitialHandCount),
 			IntProvider.POSITIVE_CODEC.optionalFieldOf("time_of_day", ConstantIntProvider.create(6000)).forGetter(LastCardConfig::getTimeOfDay),
@@ -26,13 +27,13 @@ public class LastCardConfig {
 
 	private final Identifier map;
 	private final PlayerConfig playerConfig;
-	private final IntProvider virtualPlayers;
+	private final VirtualPlayerConfig virtualPlayers;
 	private final IntProvider ticksUntilClose;
 	private final IntProvider initialHandCount;
 	private final IntProvider timeOfDay;
 	private final BlockStateProvider chairBlock;
 
-	public LastCardConfig(Identifier map, PlayerConfig playerConfig, IntProvider virtualPlayers, IntProvider ticksUntilClose, IntProvider initialHandCount, IntProvider timeOfDay, BlockStateProvider chairBlock) {
+	public LastCardConfig(Identifier map, PlayerConfig playerConfig, VirtualPlayerConfig virtualPlayers, IntProvider ticksUntilClose, IntProvider initialHandCount, IntProvider timeOfDay, BlockStateProvider chairBlock) {
 		this.map = map;
 		this.playerConfig = playerConfig;
 		this.virtualPlayers = virtualPlayers;
@@ -50,7 +51,7 @@ public class LastCardConfig {
 		return this.playerConfig;
 	}
 
-	public IntProvider getVirtualPlayers() {
+	public VirtualPlayerConfig getVirtualPlayers() {
 		return this.virtualPlayers;
 	}
 

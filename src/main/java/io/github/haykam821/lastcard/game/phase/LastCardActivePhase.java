@@ -159,7 +159,7 @@ public class LastCardActivePhase implements PlayerEntryGetter, GameActivityEvent
 		}
 
 		Random random = this.world.getRandom();
-		int virtualPlayers = this.config.getVirtualPlayers().get(random);
+		int virtualPlayers = this.config.getVirtualPlayers().getCount(random, this.singleplayer);
 
 		for (int i = 0; i < virtualPlayers; i++) {
 			TemplateRegion chair = this.map.getChair(index);
