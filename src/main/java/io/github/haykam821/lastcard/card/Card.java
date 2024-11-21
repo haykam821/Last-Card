@@ -50,6 +50,7 @@ public abstract class Card {
 
 	public final boolean canPlay(AbstractPlayerEntry player) {
 		if (!player.hasTurn()) return false;
+		if (player.getPhase().getTurnManager().getTurnAction() != null) return false;
 
 		CardDeck deck = player.getPhase().getDeck();
 

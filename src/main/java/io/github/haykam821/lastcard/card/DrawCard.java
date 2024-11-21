@@ -2,9 +2,8 @@ package io.github.haykam821.lastcard.card;
 
 import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.color.ColorSelector;
-import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
-import net.minecraft.text.Text;
+import io.github.haykam821.lastcard.turn.action.DrawTurnAction;
 
 public abstract class DrawCard extends SymbolCard {
 	private final int value;
@@ -28,22 +27,6 @@ public abstract class DrawCard extends SymbolCard {
 	@Override
 	public void play(AbstractPlayerEntry player) {
 		super.play(player);
-
-		LastCardActivePhase phase = player.getPhase();
-		AbstractPlayerEntry drawPlayer = phase.getPlayerEntry(phase.getTurnManager().getNextTurnIndex(false));
-
-		for (int index = 0; index < this.value; index++) {
-			drawPlayer.draw();
-		}
-
-		this.sendDrawMessage(phase, drawPlayer);
-		phase.getTurnManager().skipNextTurn();
-	}
-
-	private void sendDrawMessage(LastCardActivePhase phase, AbstractPlayerEntry player) {
-		Text cardDrewMessage = player.getCardDrewMessage(this.value);
-		Text cardDrewManyYouMessage = player.getCardDrewManyYouMessage(this.value);
-
-		phase.sendMessageWithException(cardDrewMessage, player, cardDrewManyYouMessage);
+		player.getPhase().getTurnManager().setNextTurnAction(new DrawTurnAction(this.value));
 	}
 }

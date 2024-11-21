@@ -2,9 +2,9 @@ package io.github.haykam821.lastcard.game.player;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import io.github.haykam821.lastcard.card.Card;
-import io.github.haykam821.lastcard.card.color.ColorSelector;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
+import io.github.haykam821.lastcard.turn.action.TurnAction;
+import io.github.haykam821.lastcard.turn.action.VirtualTurnAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -41,19 +41,8 @@ public class VirtualPlayerEntry extends AbstractPlayerEntry {
 	}
 
 	@Override
-	public void performVirtualAction() {
-		// Play the first playable card
-		for (Card card : this.getCards()) {
-			if (card.canPlay(this)) {
-				ColorSelector selector = card.getSelector();
-				this.playCard(card, selector.select(0, 0));
-
-				return;
-			}
-		}
-
-		// If no cards are playable, draw
-		this.drawForTurn();
+	public TurnAction getTurnAction() {
+		return VirtualTurnAction.INSTANCE;
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import io.github.haykam821.lastcard.card.display.player.PublicCardDisplay;
 import io.github.haykam821.lastcard.game.map.Chair;
 import io.github.haykam821.lastcard.game.map.StatusHologram;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
+import io.github.haykam821.lastcard.turn.action.TurnAction;
 import net.minecraft.server.network.ServerPlayerEntity;
 import xyz.nucleoid.map_templates.TemplateRegion;
 
@@ -161,7 +162,10 @@ public abstract class AbstractPlayerEntry extends PlayerIdentifiable {
 		this.dirtyDisplays = true;
 	}
 
-	public void performVirtualAction() {
-		return;
+	/**
+	 * {@return a behavior that this player should perform during their turn instead of normal selection}
+	 */
+	public TurnAction getTurnAction() {
+		return null;
 	}
 }

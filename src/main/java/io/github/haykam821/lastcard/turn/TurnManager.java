@@ -6,6 +6,7 @@ import io.github.haykam821.lastcard.card.color.CardColor;
 import io.github.haykam821.lastcard.card.display.CardDisplay;
 import io.github.haykam821.lastcard.game.phase.LastCardActivePhase;
 import io.github.haykam821.lastcard.game.player.AbstractPlayerEntry;
+import io.github.haykam821.lastcard.turn.action.TurnAction;
 import net.minecraft.SharedConstants;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.server.world.ServerWorld;
@@ -21,7 +22,7 @@ public class TurnManager {
 	private static final double PARTICLE_SPEED = 1 / 15d;
 	private static final int PARTICLE_UPDATE_RATE = 1;
 
-	private static final int VIRTUAL_ACTION_TURN_TICKS = SharedConstants.TICKS_PER_SECOND;
+	private static final int TURN_ACTION_TICKS = SharedConstants.TICKS_PER_SECOND;
 
 	private final LastCardActivePhase phase;
 
@@ -29,7 +30,7 @@ public class TurnManager {
 	private final CardDisplay publicPileDisplay;
 
 	private AbstractPlayerEntry turn;
-	private boolean skipNextTurn = false;
+	private TurnAction action;
 	private TurnDirection direction = TurnDirection.CLOCKWISE;
 	private int turnTicks = 0;
 
@@ -56,10 +57,8 @@ public class TurnManager {
 		this.turn = turn;
 	}
 
-	public int getNextTurnIndex(boolean skipNextTurn) {
-		int offset = this.direction.multiply(skipNextTurn && this.skipNextTurn ? 2 : 1);
-
-		return this.phase.getPlayers().indexOf(this.turn) + offset;
+	private int getNextTurnIndex() {
+		return this.phase.getPlayers().indexOf(this.turn) + this.direction.multiply(1);
 	}
 
 	public void cycleTurn() {
@@ -67,9 +66,12 @@ public class TurnManager {
 
 		AbstractPlayerEntry oldTurn = this.turn;
 
-		this.turn = this.phase.getPlayerEntry(this.getNextTurnIndex(true));
-		this.skipNextTurn = false;
+		this.turn = this.phase.getPlayerEntry(this.getNextTurnIndex());
 		this.turnTicks = 0;
+
+		if (this.action == null) {
+			this.action = this.turn.getTurnAction();
+		}
 
 		if (oldTurn != this.turn) {
 			this.sendNextTurnEffects();
@@ -88,8 +90,16 @@ public class TurnManager {
 		this.phase.updatePileDisplay();
 	}
 
-	public void skipNextTurn() {
-		this.skipNextTurn = true;
+	public TurnAction getTurnAction() {
+		return this.action;
+	}
+
+	/**
+	 * Sets a turn action that should supersede the next player's {@linkplain AbstractPlayerEntry#getTurnAction() default turn action}.
+	 * @param action the turn action that should be set for the next turn
+	 */
+	public void setNextTurnAction(TurnAction action) {
+		this.action = action;
 	}
 
 	public TurnDirection reverseDirection() {
@@ -97,17 +107,20 @@ public class TurnManager {
 	}
 
 	public void sendNextTurnEffects() {
-		if (this.turn != null) {
+		if (this.turn != null && (this.action == null || this.action.hasNextTurnEffects())) {
 			this.phase.sendMessage(this.turn.getNextTurnMessage());
 			TurnSounds.playTurnSounds(this.turn.getPlayer());
 		}
 	}
 
-	private void tickVirtualAction() {
+	private void tickAction() {
 		this.turnTicks += 1;
 
-		if (this.turnTicks == VIRTUAL_ACTION_TURN_TICKS && this.turn != null) {
-			this.turn.performVirtualAction();
+		if (this.turnTicks == TURN_ACTION_TICKS && this.turn != null && this.action != null) {
+			TurnAction action = this.action;
+			this.action = null;
+
+			action.run(turn);
 		}
 	}
 
@@ -134,7 +147,7 @@ public class TurnManager {
 
 	public void tick() {
 		if (!this.phase.isGameEnding()) {
-			this.tickVirtualAction();
+			this.tickAction();
 		}
 
 		this.tickParticles();
